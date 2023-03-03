@@ -1,86 +1,153 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+
+import 'folderPage.dart';
+import 'mediaPlayerPage.dart';
+import 'youtube.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  var videoFile;
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+  MyHomePage({super.key, this.videoFile});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  late List<Widget> tabPages;
+  var selectedIndex = 0;
 
-  void _incrementCounter() {
+  void _onItemTapped(int index) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      selectedIndex = index;
     });
   }
 
   @override
+  void initState() {
+    tabPages = <Widget>[
+      MediaPlayerPage(videoFile: widget.videoFile),
+      const FolderPage(),
+    ];
+    createFolders();
+    super.initState();
+  }
+
+  createFolders() async {
+    var directory = await getApplicationDocumentsDirectory();
+    createYoutubeFolder(directory);
+  }
+
+  createYoutubeFolder(directory) async{
+    var youtubePath =  "${directory.path}/youtube";
+    final checkPathExistence = await Directory(youtubePath).exists();
+
+    if(!checkPathExistence){
+      Directory(youtubePath).create();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+
+    openNewVideoWindow() {
+      var linkController = TextEditingController();
+
+      return showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return StatefulBuilder(builder: (context, windowState) {
+              return AlertDialog(
+                content: Column(
+                  children: [
+                    TextField(
+                      controller: linkController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Enter a Youtube link',
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    FloatingActionButton.extended(
+                        label: Text("Download"),
+                        onPressed: () {
+                          downloadVideo(linkController.text);
+                          Navigator.pop(context);
+                        },
+                    ),
+                  ],
+                ),
+              );
+            });
+          });
+    }
+
+    return SafeArea(
+      child: Scaffold(
+          body: Center(
+            child: tabPages.elementAt(selectedIndex),
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => openNewVideoWindow(),
+            child: const Icon(Icons.add),
+          ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
+          bottomNavigationBar: CustomBottomNavigationBar(
+            onNavigationItemTapped: _onItemTapped,
+            selectNavigationItem: selectedIndex,
+          )),
     );
+  }
+}
+
+class CustomBottomNavigationBar extends StatelessWidget {
+  var onNavigationItemTapped;
+  int selectNavigationItem;
+
+  CustomBottomNavigationBar(
+      {required this.onNavigationItemTapped,
+      required this.selectNavigationItem});
+
+  @override
+  Widget build(BuildContext context) {
+    return BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 8.0,
+        clipBehavior: Clip.antiAlias,
+        child: Container(
+          height: kBottomNavigationBarHeight,
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                top: BorderSide(
+                  color: Colors.grey,
+                  width: 0.5,
+                ),
+              ),
+            ),
+            child: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              currentIndex: selectNavigationItem,
+              selectedItemColor: Colors.white,
+              onTap: onNavigationItemTapped,
+              items: <BottomNavigationBarItem>[
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.music_note),
+                  label: 'Media Player',
+                ),
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.folder),
+                  label: 'Folder',
+                ),
+              ],
+            ),
+          ),
+        ));
   }
 }
