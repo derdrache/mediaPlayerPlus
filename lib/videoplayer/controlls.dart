@@ -24,10 +24,13 @@ class Controlls extends StatelessWidget {
     videoPlayer.seekTo(Duration(seconds: position.inSeconds + 10));
   }
 
+  
+
 
   @override
   Widget build(BuildContext context) {
     double iconSize = 50;
+
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

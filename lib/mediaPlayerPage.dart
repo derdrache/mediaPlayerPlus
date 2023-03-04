@@ -41,7 +41,7 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
             for(var video in allVideos){
               bool isSelected = widget.videoFile == null ? false : video.path == widget.videoFile.path;
               var videoTitle = video.path.split("/").last.replaceAll(".mp4", "");
-              var videoSize = video.lengthSync() / 1000000;
+              var videoSize = (video.lengthSync() / 1000000).round();
 
               videosContainerList.add(
                 InkWell(
@@ -52,6 +52,7 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
                   child: Container(
                     margin: const EdgeInsets.all(10),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
@@ -75,7 +76,7 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
                             )
                           ],
                         ),
-                        Text("${videoSize} mb")
+                        Text("Size: ${videoSize} mb")
                       ],
                     ),
                   ),

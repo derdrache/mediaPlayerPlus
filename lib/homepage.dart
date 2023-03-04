@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'folderPage.dart';
@@ -41,19 +42,20 @@ class _MyHomePageState extends State<MyHomePage> {
     createYoutubeFolder(directory);
   }
 
-  createYoutubeFolder(directory) async{
-    var youtubePath =  "${directory.path}/youtube";
+  createYoutubeFolder(directory) async {
+    var youtubePath = "${directory.path}/youtube";
     final checkPathExistence = await Directory(youtubePath).exists();
 
-    if(!checkPathExistence){
+    if (!checkPathExistence) {
       Directory(youtubePath).create();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     openNewVideoWindow() {
+      var videoQuality = "low";
+      var onlySound = false;
       var linkController = TextEditingController();
 
       return showDialog(
@@ -70,13 +72,67 @@ class _MyHomePageState extends State<MyHomePage> {
                         hintText: 'Enter a Youtube link',
                       ),
                     ),
+                    IconButton(
+                        onPressed: () async {
+                          ClipboardData? cdata =
+                              await Clipboard.getData(Clipboard.kTextPlain);
+                          String? copiedtext = cdata?.text;
+
+                          windowState(() {
+                            linkController.text = copiedtext ?? "";
+                          });
+                        },
+                        icon: Icon(Icons.content_paste),
+                      iconSize: 30,
+                    ),
+                    SizedBox(height: 20),
+                    CheckboxListTile(
+                        title: Text("low Quality"),
+                        value: videoQuality.contains("low"),
+                        onChanged: (value) {
+                          if (value!) {
+                            windowState(() {
+                              videoQuality = "low";
+                            });
+                          }
+                        }),
+                    CheckboxListTile(
+                        title: Text("med Quality"),
+                        value: videoQuality.contains("med"),
+                        onChanged: (value) {
+                          if (value!) {
+                            windowState(() {
+                              videoQuality = "med";
+                            });
+                          }
+                        }),
+                    CheckboxListTile(
+                        title: Text("high Quality"),
+                        value: videoQuality.contains("high"),
+                        onChanged: (value) {
+                          if (value!) {
+                            windowState(() {
+                              videoQuality = "high";
+                            });
+                          }
+                        }),
+                    SizedBox(height: 20),
+                    CheckboxListTile(
+                        title: Text("Sound only"),
+                        value: onlySound,
+                        onChanged: (value) {
+                          windowState(() {
+                            onlySound = value!;
+                          });
+                        }),
                     SizedBox(height: 20),
                     FloatingActionButton.extended(
-                        label: Text("Download"),
-                        onPressed: () {
-                          downloadVideo(linkController.text);
-                          Navigator.pop(context);
-                        },
+                      label: Text("Download"),
+                      onPressed: () {
+                        downloadVideo(linkController.text, videoQuality,
+                            onlySound: onlySound);
+                        Navigator.pop(context);
+                      },
                     ),
                   ],
                 ),

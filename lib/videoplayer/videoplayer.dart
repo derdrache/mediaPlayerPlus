@@ -38,6 +38,7 @@ class _OwnVideoPlayerState extends State<OwnVideoPlayer> {
       ..initialize().then((_) {
         setState(() {});
       });
+    _videoController.setVolume(100);
     _videoController.addListener(() {
       setState(() {
         videoProgress = _videoController.value.position;
@@ -45,6 +46,7 @@ class _OwnVideoPlayerState extends State<OwnVideoPlayer> {
         videoBuffered = videoLength;
       });
     });
+    _videoController.play();
   }
 
   @override
