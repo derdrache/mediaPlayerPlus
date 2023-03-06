@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:better_player/better_player.dart';
+import 'package:hive/hive.dart';
 import 'package:media_player_plus/homepage.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:video_player/video_player.dart';
 import 'videoplayer/videoplayer.dart';
 
 
@@ -17,6 +19,7 @@ class MediaPlayerPage extends StatefulWidget {
 }
 
 class _MediaPlayerPageState extends State<MediaPlayerPage> {
+  var mediaBox = Hive.box('mediaBox');
 
   getAllVideos() async {
     var dir = await getApplicationDocumentsDirectory();
@@ -41,7 +44,10 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
             for(var video in allVideos){
               bool isSelected = widget.videoFile == null ? false : video.path == widget.videoFile.path;
               var videoTitle = video.path.split("/").last.replaceAll(".mp4", "");
-              var videoSize = (video.lengthSync() / 1000000).round();
+              var videoData = mediaBox.get(videoTitle) ?? {};
+              var status = videoData["status"] ?? "";
+              Duration duration =  Duration(milliseconds: videoData["duration"]);
+              var videoImage = videoData["image"] ?? "";
 
               videosContainerList.add(
                 InkWell(
@@ -51,32 +57,45 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
                   },
                   child: Container(
                     margin: const EdgeInsets.all(10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
                       children: [
-                        Row(
-                          children: [
-                            Expanded(child: Text(
-                              videoTitle,maxLines: 2, style: TextStyle(
-                                fontSize: 20,
-                                color: isSelected ? Colors.blue: Colors.black
-                              ),
-                            )),
-                            const SizedBox(width: 10),
-                            IconButton(
-                                onPressed: () async {
-                                  await video.delete();
-                                  setState(() {
+                        Image.network(videoImage, scale: 1.3),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(child: Text(
+                                    videoTitle,maxLines: 2, style: TextStyle(
+                                      fontSize: 20,
+                                      color: isSelected ? Colors.blue: Colors.black
+                                    ),
+                                  )),
+                                  const SizedBox(width: 10),
+                                  IconButton(
+                                      onPressed: () async {
+                                        await video.delete();
+                                        setState(() {
 
-                                  });
-                                },
-                                color: Colors.red,
-                                iconSize: 30,
-                                icon: const Icon(Icons.delete)
-                            )
-                          ],
+                                        });
+                                      },
+                                      color: Colors.red,
+                                      iconSize: 30,
+                                      icon: const Icon(Icons.delete)
+                                  )
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text("Status: $status / "),
+                                  Text("${duration.inMinutes}:${duration.inSeconds} min")
+                                ],
+                              )
+                            ],
+                          ),
                         ),
-                        Text("Size: ${videoSize} mb")
                       ],
                     ),
                   ),

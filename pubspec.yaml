@@ -42,6 +42,9 @@ dependencies:
   path_provider: ^2.0.13
   youtube_explode_dart: ^1.12.3
   filesystem_picker: ^3.1.0
+  flutter_background: ^1.2.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
 
   better_player: ^0.0.83
 

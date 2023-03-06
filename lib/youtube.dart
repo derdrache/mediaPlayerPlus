@@ -1,13 +1,28 @@
 import 'dart:io';
+import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+import 'package:flutter_background/flutter_background.dart';
+
+final androidConfig = FlutterBackgroundAndroidConfig(
+  notificationTitle: "flutter_background example app",
+  notificationText: "Background notification for keeping the example app running in the background",
+  notificationImportance: AndroidNotificationImportance.Default,
+  notificationIcon: AndroidResource(name: 'background_icon', defType: 'drawable'), // Default is ic_launcher from folder mipmap
+);
 
 
 Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = false}) async {
+  await FlutterBackground.initialize(androidConfig: androidConfig);
+  await FlutterBackground.enableBackgroundExecution();
+  var mediaBox = Hive.box('mediaBox');
+
   final yt = YoutubeExplode();
   var video = await yt.videos.get(videoLink);
   var videoId = video.id;
   var videoTitle = video.title;
+  var videoDuration = video.duration;
+  var videoImage = video.thumbnails.lowResUrl;
   videoTitle = videoTitle.replaceAll("/", " ");
   videoTitle = videoTitle.replaceAll("|", " ");
   yt.close();
@@ -28,8 +43,18 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
   final request = await httpClient.getUrl(downloadUrl);
   final response = await request.close();
   final output = File(outputPath);
+
+  mediaBox.put(videoTitle,{
+    "status": "start",
+    "duration": videoDuration?.inMilliseconds,
+    "image": videoImage
+  });
+
+
   await response.pipe(output.openWrite()).whenComplete(() {
     httpClient.close();
+    var videoData = mediaBox.get(videoTitle);
+    videoData["status"] = "done";
     print('Video Downloaded Successfully');
   });
   yt2.close();
