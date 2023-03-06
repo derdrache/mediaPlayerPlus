@@ -3,10 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:better_player/better_player.dart';
 import 'package:hive/hive.dart';
-import 'package:media_player_plus/homepage.dart';
+import 'package:media_player_plus/pages/homepage.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:video_player/video_player.dart';
-import 'videoplayer/videoplayer.dart';
+import '../videoplayer/videoplayer.dart';
 
 
 class MediaPlayerPage extends StatefulWidget {
