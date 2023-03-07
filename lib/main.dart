@@ -7,8 +7,10 @@ import 'pages/homepage.dart';
 void main() async{
   await hiveInit();
 
+
   runApp(const MyApp());
 }
+
 
 hiveInit() async {
   await Hive.initFlutter();

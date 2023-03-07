@@ -1,9 +1,11 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:video_player/video_player.dart';
-import 'dart:io';
 
 import 'controlls.dart';
+
+
 
 class OwnVideoPlayer extends StatefulWidget {
   var mediaFile;
@@ -19,6 +21,8 @@ class _OwnVideoPlayerState extends State<OwnVideoPlayer> {
   var videoProgress = Duration(seconds: 0);
   var videoBuffered = Duration(seconds: 0);
   var videoLength = Duration(seconds: 0);
+  var mediaBox = Hive.box('mediaBox');
+
 
   @override
   void initState() {
@@ -33,19 +37,34 @@ class _OwnVideoPlayerState extends State<OwnVideoPlayer> {
   }
 
   initVideoPlayer() {
+    var videoTitle = widget.mediaFile.path.split("/").last.replaceAll(".mp4", "");
+    var savedPosition = Duration(seconds: mediaBox.get(videoTitle)["position"] ?? 0);
+
     _videoController = VideoPlayerController.file(widget.mediaFile,
         videoPlayerOptions: VideoPlayerOptions(allowBackgroundPlayback: true))
       ..initialize().then((_) {
-        setState(() {});
+        setState(() {
+          _videoController.seekTo(savedPosition);
+        });
       });
-    _videoController.setVolume(100);
+
     _videoController.addListener(() {
+      var videoPosition = _videoController.value.position;
+      if(videoPosition.inSeconds == 0){
+        mediaBox.get(videoTitle)["position"] = 0;
+      }else if(videoPosition.inSeconds > 20){
+        mediaBox.get(videoTitle)["position"] = videoPosition.inSeconds - 10;
+      }
+
+
       setState(() {
-        videoProgress = _videoController.value.position;
+        videoProgress = videoPosition;
         videoLength = _videoController.value.duration;
         videoBuffered = videoLength;
       });
     });
+
+
     _videoController.play();
   }
 
