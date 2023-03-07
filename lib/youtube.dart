@@ -45,13 +45,6 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
   var downloadUrl = onlySound ? soundonly.url : videoQuality[selectedVideoQuality]!.url;
   final output = File(outputPath);
 
-  final taskId = await FlutterDownloader.enqueue(
-    url: downloadUrl.toString(),
-    headers: {}, // optional: header send with url (auth token etc)
-    savedDir: output.path,
-    showNotification: true, // show download progress in status bar (for Android)
-    openFileFromNotification: true, // click on notification to open downloaded file (for Android)
-  );
 
 /*
   final httpClient = HttpClient();
