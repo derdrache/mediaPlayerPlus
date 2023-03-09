@@ -40,8 +40,9 @@ class _FolderPageState extends State<FolderPage> {
                 var videoTitle = video.path.split("/").last.replaceAll(".mp4", "");
                 var videoData = mediaBox.get(videoTitle) ?? {};
                 var status = videoData["status"] ?? "";
-                Duration duration =  Duration(milliseconds: videoData["duration"]);
+                Duration duration =  Duration(milliseconds: videoData["duration"] ?? 0);
                 var videoImage = videoData["image"] ?? "";
+                var downloadStatus = videoData["downloadStatus"];
 
                 videosContainerList.add(
                     InkWell(
@@ -83,7 +84,7 @@ class _FolderPageState extends State<FolderPage> {
                                   ),
                                   Row(
                                     children: [
-                                      Text("Status: $status / "),
+                                      Text("Status: $status - $downloadStatus % / "),
                                       Text("${duration.inMinutes}:${duration.inSeconds} min")
                                     ],
                                   )
