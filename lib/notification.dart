@@ -29,8 +29,8 @@ class NotificationService {
     var notificationBody = progress < 100 ? "downloading.." : "Done";
 
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'progress channel', 'progress channel',
-        channelDescription: 'progress channel description',
+        id.toString(), id.toString(),
+        channelDescription: id.toString(),
         channelShowBadge: false,
         importance: Importance.max,
         priority: Priority.high,
@@ -38,8 +38,10 @@ class NotificationService {
         showProgress: true,
         maxProgress: 100,
         progress: progress);
-    var platformChannelSpecifics =
-    NotificationDetails(android: androidPlatformChannelSpecifics);
+    var platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics
+    );
+
     _flutterLocalNotificationsPlugin.show(id, title,
         notificationBody, platformChannelSpecifics,
         payload: 'item x');
