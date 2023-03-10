@@ -46,7 +46,6 @@ class _FolderPageState extends State<FolderPage> {
                 var videoImage = videoData["image"] ?? "";
                 var downloadStatus = videoData["downloadStatus"];
 
-
                 videosContainerList.add(
                     InkWell(
                       onTap: () {
@@ -57,7 +56,7 @@ class _FolderPageState extends State<FolderPage> {
                         margin: const EdgeInsets.all(10),
                         child: Row(
                           children: [
-                            Image.network(videoImage, scale: 1.3),
+                            if(videoImage != "") Image.network(videoImage, scale: 1.3),
                             SizedBox(width: 10),
                             Expanded(
                               child: Column(
