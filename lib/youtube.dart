@@ -1,23 +1,14 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
-import 'package:flutter_background/flutter_background.dart';
+import 'package:al_downloader/al_downloader.dart';
 
-
-final androidConfig = FlutterBackgroundAndroidConfig(
-  notificationTitle: "flutter_background example app",
-  notificationText: "Background notification for keeping the example app running in the background",
-  notificationImportance: AndroidNotificationImportance.Default,
-  notificationIcon: AndroidResource(name: 'background_icon', defType: 'drawable'), // Default is ic_launcher from folder mipmap
-);
-
-
+import 'notification.dart';
 
 
 Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = false}) async {
-  await FlutterBackground.initialize(androidConfig: androidConfig);
-  await FlutterBackground.enableBackgroundExecution();
   var mediaBox = Hive.box('mediaBox');
 
   final yt = YoutubeExplode();
@@ -32,7 +23,6 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
 
   Directory directory  = await getApplicationDocumentsDirectory();
   var path = directory.path;
-  var outputPath = "$path/youtube/$videoTitle.mp4";
   final yt2 = YoutubeExplode();
   final manifest = await yt2.videos.streamsClient.getManifest(videoId);
   var soundonly = manifest.audioOnly.first;
@@ -43,25 +33,33 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
   };
   yt2.close();
   var downloadUrl = onlySound ? soundonly.url : videoQuality[selectedVideoQuality]!.url;
-  final output = File(outputPath);
-
-
-  final httpClient = HttpClient();
-  final request = await httpClient.getUrl(downloadUrl);
-  final response = await request.close();
 
   mediaBox.put(videoTitle,{
     "status": "start",
+    "downloadStatus": "0",
     "duration": videoDuration?.inMilliseconds,
     "image": videoImage
   });
 
-  await response.pipe(output.openWrite()).whenComplete(() {
-    httpClient.close();
-    var videoData = mediaBox.get(videoTitle);
-    videoData["status"] = "done";
-    print('Video Downloaded Successfully');
-  });
+  mediaBox.put("downloadId", mediaBox.get("downloadId")??0+1);
+
+
+  ALDownloader.download(downloadUrl.toString(), directoryPath: "$path/youtube/", fileName: "$videoTitle.mp4",
+      downloaderHandlerInterface:
+      ALDownloaderHandlerInterface(progressHandler: (progress) {
+        mediaBox.get(videoTitle)["downloadStatus"] = (progress*100).round().toString();
+        NotificationService().createNotification((progress*100).round(), mediaBox.get("downloadId"), videoTitle);
+      }, succeededHandler: () {
+        mediaBox.get(videoTitle)["status"] = "done";
+        mediaBox.get(videoTitle)["downloadStatus"] = "100";
+        debugPrint('ALDownloader | download succeeded\n');
+      }, failedHandler: () {
+        mediaBox.get(videoTitle)["status"] = "error";
+        debugPrint('ALDownloader | download failed\n');
+      }, pausedHandler: () {
+        mediaBox.get(videoTitle)["status"] = "pause?";
+        debugPrint('ALDownloader | download paused}\n');
+      }));
 
 
 }
