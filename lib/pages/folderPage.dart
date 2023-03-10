@@ -39,6 +39,7 @@ class _FolderPageState extends State<FolderPage> {
               for(var video in allVideos){
                 var videoTitle = video.path.split("/").last.replaceAll(".mp4", "");
                 var videoData = mediaBox.get(videoTitle) ?? {};
+                print(videoData);
                 var status = videoData["status"] ?? "";
                 Duration duration =  Duration(milliseconds: videoData["duration"] ?? 0);
                 var videoImage = videoData["image"] ?? "";

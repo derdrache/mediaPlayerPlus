@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:al_downloader/al_downloader.dart';
 
+import 'notification.dart';
 
 
 Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = false}) async {
@@ -40,10 +41,14 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
     "image": videoImage
   });
 
+  mediaBox.put("downloadId", mediaBox.get("downloadId")??0+1);
+
+
   ALDownloader.download(downloadUrl.toString(), directoryPath: "$path/youtube/", fileName: "$videoTitle.mp4",
       downloaderHandlerInterface:
       ALDownloaderHandlerInterface(progressHandler: (progress) {
         mediaBox.get(videoTitle)["downloadStatus"] = (progress*100).round().toString();
+        NotificationService().createNotification((progress*100).round(), mediaBox.get("downloadId"), videoTitle);
       }, succeededHandler: () {
         mediaBox.get(videoTitle)["status"] = "done";
         mediaBox.get(videoTitle)["downloadStatus"] = "100";
