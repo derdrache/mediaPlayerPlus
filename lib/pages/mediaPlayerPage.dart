@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import '../add_new_video_link_window.dart';
+import '../functions/formatDuration.dart';
 import '../videoplayer/videoplayer.dart';
 
 
@@ -61,7 +62,7 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
                   Row(
                     children: [
                       Text("Status: $status / "),
-                      Text("${duration.inMinutes}:${duration.inSeconds} min")
+                      Text("${formatDuration(duration)}")
                     ],
                   )
                 ],
