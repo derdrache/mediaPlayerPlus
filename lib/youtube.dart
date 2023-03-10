@@ -61,7 +61,6 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
         debugPrint('ALDownloader | download paused}\n');
       }));
 
-
 }
 
 

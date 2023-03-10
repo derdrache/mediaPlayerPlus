@@ -49,6 +49,7 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
                       IconButton(
                           onPressed: () async {
                             await widget.videoFile.delete();
+                            mediaBox.delete(videoTitle);
                             setState(() {
                               widget.videoFile = null;
                             });

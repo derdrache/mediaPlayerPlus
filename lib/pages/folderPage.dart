@@ -75,6 +75,7 @@ class _FolderPageState extends State<FolderPage> {
                                       IconButton(
                                           onPressed: () async {
                                             await video.delete();
+                                            mediaBox.delete(videoTitle);
                                             setState(() {
 
                                             });
