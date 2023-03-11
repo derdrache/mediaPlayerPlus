@@ -31,6 +31,7 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
     "med": manifest.video[1],
     "high": manifest.video[2]
   };
+
   yt2.close();
   var downloadUrl = onlySound ? soundonly.url : videoQuality[selectedVideoQuality]!.url;
 
@@ -43,23 +44,29 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
 
   mediaBox.put("downloadId", mediaBox.get("downloadId")??0+1);
 
-
   ALDownloader.download(downloadUrl.toString(), directoryPath: "$path/youtube/", fileName: "$videoTitle.mp4",
-      downloaderHandlerInterface:
-      ALDownloaderHandlerInterface(progressHandler: (progress) {
-        mediaBox.get(videoTitle)["downloadStatus"] = (progress*100).round().toString();
+      downloaderHandlerInterface: ALDownloaderHandlerInterface(progressHandler: (progress){
+        var hiveVideoData = mediaBox.get(videoTitle);
+        hiveVideoData["downloadStatus"] = (progress*100).round().toString();
+        mediaBox.put(videoTitle, hiveVideoData);
         NotificationService().createNotification((progress*100).round(), mediaBox.get("downloadId"), videoTitle);
       }, succeededHandler: () {
-        mediaBox.get(videoTitle)["status"] = "done";
-        mediaBox.get(videoTitle)["downloadStatus"] = "100";
+        var hiveVideoData = mediaBox.get(videoTitle);
+        hiveVideoData["status"] = "done";
+        hiveVideoData["downloadStatus"] = "100";
+        mediaBox.put(videoTitle, hiveVideoData);
         debugPrint('ALDownloader | download succeeded\n');
       }, failedHandler: () {
         mediaBox.get(videoTitle)["status"] = "error";
+        ALDownloader.remove(downloadUrl.toString());
         debugPrint('ALDownloader | download failed\n');
       }, pausedHandler: () {
         mediaBox.get(videoTitle)["status"] = "pause?";
         debugPrint('ALDownloader | download paused}\n');
-      }));
+      }),
+    redownloadIfNeeded: true
+  );
+
 
 
 }

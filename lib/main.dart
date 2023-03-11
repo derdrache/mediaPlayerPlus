@@ -18,7 +18,7 @@ void main() async{
 hiveInit() async {
   await Hive.initFlutter();
 
-  await Hive.openBox("mediaBox", crashRecovery: false);
+  await Hive.openBox("mediaBox", crashRecovery: true);
 }
 
 class MyApp extends StatelessWidget {

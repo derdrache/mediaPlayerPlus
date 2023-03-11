@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../functions/formatDuration.dart';
 import 'homepage.dart';
 
 class FolderPage extends StatefulWidget {
@@ -24,6 +25,7 @@ class _FolderPageState extends State<FolderPage> {
     return await youtubeDir.list().toList();
   }
 
+
   @override
   Widget build(BuildContext context) {
 
@@ -39,7 +41,6 @@ class _FolderPageState extends State<FolderPage> {
               for(var video in allVideos){
                 var videoTitle = video.path.split("/").last.replaceAll(".mp4", "");
                 var videoData = mediaBox.get(videoTitle) ?? {};
-                print(videoData);
                 var status = videoData["status"] ?? "";
                 Duration duration =  Duration(milliseconds: videoData["duration"] ?? 0);
                 var videoImage = videoData["image"] ?? "";
@@ -55,7 +56,7 @@ class _FolderPageState extends State<FolderPage> {
                         margin: const EdgeInsets.all(10),
                         child: Row(
                           children: [
-                            Image.network(videoImage, scale: 1.3),
+                            if(videoImage != "") Image.network(videoImage, scale: 1.3),
                             SizedBox(width: 10),
                             Expanded(
                               child: Column(
@@ -73,6 +74,7 @@ class _FolderPageState extends State<FolderPage> {
                                       IconButton(
                                           onPressed: () async {
                                             await video.delete();
+                                            mediaBox.delete(videoTitle);
                                             setState(() {
 
                                             });
@@ -86,7 +88,7 @@ class _FolderPageState extends State<FolderPage> {
                                   Row(
                                     children: [
                                       Text("Status: $status - $downloadStatus % / "),
-                                      Text("${duration.inMinutes}:${duration.inSeconds} min")
+                                      Text("${formatDuration(duration)}")
                                     ],
                                   )
                                 ],
