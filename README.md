@@ -11,7 +11,6 @@ A media player with the ability to download YouTube videos, completely without a
 
 
 **features in progress:**
-- better download manager
 - manage and play your own videos and music files
 - folder structure for better overview#
 - improve download speed
