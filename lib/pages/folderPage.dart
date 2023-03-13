@@ -69,8 +69,11 @@ class _FolderPageState extends State<FolderPage> {
                             onPressed: () async {
                               await video.delete();
                               mediaBox.delete(videoTitle);
-                              ALDownloader.cancel(downloadUrl);
-                              FlutterLocalNotificationsPlugin().cancel(videoData["id"]);
+
+                              if(status != "done"){
+                                ALDownloader.cancel(downloadUrl);
+                                FlutterLocalNotificationsPlugin().cancel(videoData["id"]);
+                              }
 
                               setState(() {});
                             },
