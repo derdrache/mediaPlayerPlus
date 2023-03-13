@@ -9,32 +9,31 @@ import 'notification.dart';
 
 
 Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = false}) async {
-  var mediaBox = Hive.box('mediaBox');
+  final mediaBox = Hive.box('mediaBox');
   Directory directory  = await getApplicationDocumentsDirectory();
-  var path = "${directory.path}/youtube/";
+  String path = "${directory.path}/youtube/";
 
   final yt = YoutubeExplode();
-  var video = await yt.videos.get(videoLink);
-  var videoId = video.id;
-  var videoTitle = video.title;
-  var videoDuration = video.duration;
-  var videoImage = video.thumbnails.lowResUrl;
+  final video = await yt.videos.get(videoLink);
+  final videoId = video.id;
+  String videoTitle = video.title;
+  Duration? videoDuration = video.duration;
+  String videoImage = video.thumbnails.lowResUrl;
   videoTitle = videoTitle.replaceAll("/", " ");
   videoTitle = videoTitle.replaceAll("|", " ");
 
   final manifest = await yt.videos.streamsClient.getManifest(videoId);
-  var soundonly = manifest.audioOnly.first;
-  var videoQuality = {
+  yt.close();
+
+  final soundonly = manifest.audioOnly.first;
+  Map videoQuality = {
     "low": manifest.video.first,
     "med": manifest.video[1],
     "high": manifest.video[2]
   };
-
-  yt.close();
-
   File("$path$videoTitle.mp4");
-  var downloadUrl = onlySound ? soundonly.url : videoQuality[selectedVideoQuality]!.url;
-  var downloadId = mediaBox.get("downloadId")??0+1;
+  final downloadUrl = onlySound ? soundonly.url : videoQuality[selectedVideoQuality]!.url;
+  int downloadId = mediaBox.get("downloadId")??0+1;
 
   mediaBox.put(videoTitle,{
     "status": "start",
