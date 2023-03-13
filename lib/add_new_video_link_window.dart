@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'youtube.dart';
 
 addNewVideoWindow(context) {
-  var videoQuality = "low";
+  var videoQuality = "med";
   var onlySound = false;
   var linkController = TextEditingController();
 
