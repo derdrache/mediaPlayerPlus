@@ -79,7 +79,14 @@ addNewVideoWindow(context) {
                 FloatingActionButton.extended(
                   label: Text("Download"),
                   onPressed: () {
-                    if(linkController.text.isEmpty) return;
+                    bool isYouTubeLink = linkController.text.contains("youtu");
+
+                    if(linkController.text.isEmpty || !isYouTubeLink){
+                      windowState((){
+                        linkController.clear();
+                      });
+                      return;
+                    }
 
                     downloadVideo(linkController.text, videoQuality,
                         onlySound: onlySound);
