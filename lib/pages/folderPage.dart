@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:al_downloader/al_downloader.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../functions/formatDuration.dart';
 import 'homepage.dart';
@@ -26,8 +28,75 @@ class _FolderPageState extends State<FolderPage> {
   }
 
 
+
   @override
   Widget build(BuildContext context) {
+
+    createVideoDisplay(video){
+      var videoTitle = video.path.split("/").last.replaceAll(".mp4", "");
+      var videoData = mediaBox.get(videoTitle) ?? {};
+      var status = videoData["status"] ?? "";
+      Duration duration =  Duration(milliseconds: videoData["duration"] ?? 0);
+      var videoImage = videoData["image"] ?? "";
+      var downloadStatus = videoData["downloadStatus"];
+      var downloadUrl = videoData["url"];
+
+      return InkWell(
+        onTap: () {
+          Navigator.pushReplacement(
+            context,MaterialPageRoute(builder: (context) => MyHomePage(videoFile: video)),);
+        },
+        child: Container(
+          margin: const EdgeInsets.all(10),
+          child: Row(
+            children: [
+              if(videoImage != "") Image.network(videoImage, scale: 1.3),
+              SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(child: Text(
+                          videoTitle,maxLines: 2, style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.black
+                        ),
+                        )),
+                        const SizedBox(width: 10),
+                        IconButton(
+                            onPressed: () async {
+                              await video.delete();
+                              mediaBox.delete(videoTitle);
+                              ALDownloader.cancel(downloadUrl);
+                              FlutterLocalNotificationsPlugin().cancel(videoData["id"]);
+
+                              setState(() {});
+                            },
+                            color: Colors.red,
+                            iconSize: 30,
+                            icon: downloadStatus == "done"
+                                ? const Icon(Icons.delete)
+                                : const Icon(Icons.file_download_off)
+                        )
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text("Status: $status - $downloadStatus % / "),
+                        Text("${formatDuration(duration)}")
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+
+    }
 
     showAllVideos(){
       return FutureBuilder(
@@ -37,70 +106,9 @@ class _FolderPageState extends State<FolderPage> {
               var allVideos = snapshot.data!;
               List<Widget> videosContainerList = [];
 
-
               for(var video in allVideos){
-                var videoTitle = video.path.split("/").last.replaceAll(".mp4", "");
-                var videoData = mediaBox.get(videoTitle) ?? {};
-                var status = videoData["status"] ?? "";
-                Duration duration =  Duration(milliseconds: videoData["duration"] ?? 0);
-                var videoImage = videoData["image"] ?? "";
-                var downloadStatus = videoData["downloadStatus"];
-
-                videosContainerList.add(
-                    InkWell(
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,MaterialPageRoute(builder: (context) => MyHomePage(videoFile: video)),);
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.all(10),
-                        child: Row(
-                          children: [
-                            if(videoImage != "") Image.network(videoImage, scale: 1.3),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Expanded(child: Text(
-                                        videoTitle,maxLines: 2, style: TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.black
-                                      ),
-                                      )),
-                                      const SizedBox(width: 10),
-                                      IconButton(
-                                          onPressed: () async {
-                                            await video.delete();
-                                            mediaBox.delete(videoTitle);
-                                            setState(() {
-
-                                            });
-                                          },
-                                          color: Colors.red,
-                                          iconSize: 30,
-                                          icon: const Icon(Icons.delete)
-                                      )
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text("Status: $status - $downloadStatus % / "),
-                                      Text("${formatDuration(duration)}")
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                );
+                videosContainerList.add(createVideoDisplay(video));
               }
-
 
               return ListView(
                 shrinkWrap: true,
@@ -113,6 +121,7 @@ class _FolderPageState extends State<FolderPage> {
           }
       );
     }
+
 
     return Column(
       children: [

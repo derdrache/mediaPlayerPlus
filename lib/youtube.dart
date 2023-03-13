@@ -10,6 +10,8 @@ import 'notification.dart';
 
 Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = false}) async {
   var mediaBox = Hive.box('mediaBox');
+  Directory directory  = await getApplicationDocumentsDirectory();
+  var path = "${directory.path}/youtube/";
 
   final yt = YoutubeExplode();
   var video = await yt.videos.get(videoLink);
@@ -19,12 +21,8 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
   var videoImage = video.thumbnails.lowResUrl;
   videoTitle = videoTitle.replaceAll("/", " ");
   videoTitle = videoTitle.replaceAll("|", " ");
-  yt.close();
 
-  Directory directory  = await getApplicationDocumentsDirectory();
-  var path = directory.path;
-  final yt2 = YoutubeExplode();
-  final manifest = await yt2.videos.streamsClient.getManifest(videoId);
+  final manifest = await yt.videos.streamsClient.getManifest(videoId);
   var soundonly = manifest.audioOnly.first;
   var videoQuality = {
     "low": manifest.video.first,
@@ -32,24 +30,29 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
     "high": manifest.video[2]
   };
 
-  yt2.close();
+  yt.close();
+
+  File("$path$videoTitle.mp4");
   var downloadUrl = onlySound ? soundonly.url : videoQuality[selectedVideoQuality]!.url;
+  var downloadId = mediaBox.get("downloadId")??0+1;
 
   mediaBox.put(videoTitle,{
     "status": "start",
+    "url": downloadUrl.toString(),
     "downloadStatus": "0",
     "duration": videoDuration?.inMilliseconds,
-    "image": videoImage
+    "image": videoImage,
+    "id": downloadId
   });
 
-  mediaBox.put("downloadId", mediaBox.get("downloadId")??0+1);
+  mediaBox.put("downloadId", downloadId);
 
-  ALDownloader.download(downloadUrl.toString(), directoryPath: "$path/youtube/", fileName: "$videoTitle.mp4",
+  ALDownloader.download(downloadUrl.toString(), directoryPath: path, fileName: "$videoTitle.mp4",
       downloaderHandlerInterface: ALDownloaderHandlerInterface(progressHandler: (progress){
         var hiveVideoData = mediaBox.get(videoTitle);
         hiveVideoData["downloadStatus"] = (progress*100).round().toString();
         mediaBox.put(videoTitle, hiveVideoData);
-        NotificationService().createNotification((progress*100).round(), mediaBox.get("downloadId"), videoTitle);
+        NotificationService().createNotification((progress*100).round(), downloadId, videoTitle);
       }, succeededHandler: () {
         var hiveVideoData = mediaBox.get(videoTitle);
         hiveVideoData["status"] = "done";
@@ -66,8 +69,6 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
       }),
     redownloadIfNeeded: true
   );
-
-
 
 }
 
