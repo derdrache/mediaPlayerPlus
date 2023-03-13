@@ -51,7 +51,7 @@ class _FolderPageState extends State<FolderPage> {
           child: Row(
             children: [
               if(videoImage != "") Image.network(videoImage, scale: 1.3),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,30 +59,11 @@ class _FolderPageState extends State<FolderPage> {
                     Row(
                       children: [
                         Expanded(child: Text(
-                          videoTitle,maxLines: 2, style: TextStyle(
+                          videoTitle,maxLines: 2, style: const TextStyle(
                             fontSize: 20,
                             color: Colors.black
                         ),
                         )),
-                        const SizedBox(width: 10),
-                        IconButton(
-                            onPressed: () async {
-                              await video.delete();
-                              mediaBox.delete(videoTitle);
-
-                              if(status != "done"){
-                                ALDownloader.cancel(downloadUrl);
-                                FlutterLocalNotificationsPlugin().cancel(videoData["id"]);
-                              }
-
-                              setState(() {});
-                            },
-                            color: Colors.red,
-                            iconSize: 30,
-                            icon: downloadStatus == "done"
-                                ? const Icon(Icons.delete)
-                                : const Icon(Icons.file_download_off)
-                        )
                       ],
                     ),
                     Row(
@@ -94,6 +75,25 @@ class _FolderPageState extends State<FolderPage> {
                   ],
                 ),
               ),
+              const SizedBox(width: 10),
+              IconButton(
+                  onPressed: () async {
+                    if(status != "done"){
+                      ALDownloader.cancel(downloadUrl);
+                      FlutterLocalNotificationsPlugin().cancel(videoData["id"]);
+                    }
+
+                    await video.delete();
+                    mediaBox.delete(videoTitle);
+
+                    setState(() {});
+                  },
+                  color: Colors.red,
+                  iconSize: 30,
+                  icon: status == "done"
+                      ? const Icon(Icons.delete)
+                      : const Icon(Icons.file_download_off)
+              )
             ],
           ),
         ),
