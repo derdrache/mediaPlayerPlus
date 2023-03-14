@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:media_player_plus/videoplayer/fullscreen.dart';
 import 'package:video_player/video_player.dart';
 
 class Controlls extends StatefulWidget {
@@ -106,7 +107,18 @@ class _ControllsState extends State<Controlls> {
               style: TextStyle(fontWeight: FontWeight.bold),
             )),
           ),
-        )
+        ),
+        IconButton(
+          iconSize: iconSize - 10,
+          icon: Icon(Icons.fullscreen),
+          //IconBadge(icon: Icon(Icons.fast_forward), text: "+15"),
+          onPressed: (){
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => VideoFullScreen(videoPlayer: widget.videoPlayer)),
+            );
+          },
+        ),
       ],
     );
   }
