@@ -2,16 +2,21 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:al_downloader/al_downloader.dart';
 
 import 'notification.dart';
 
-
 Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = false}) async {
   final mediaBox = Hive.box('mediaBox');
   Directory directory  = await getApplicationDocumentsDirectory();
-  String path = "${directory.path}/youtube/";
+  Directory? externalDirectory  = await getExternalStorageDirectory();
+  var speicherPfad = mediaBox.get("speicherPfad") ?? "Interner Speicher";
+  var selectedDirectory = speicherPfad != "Interner Speicher" ? externalDirectory?.path : directory.path;
+
+  String path = "$selectedDirectory/youtube/";
+
 
   final yt = YoutubeExplode();
   final video = await yt.videos.get(videoLink);
@@ -45,6 +50,7 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
   });
 
   mediaBox.put("downloadId", downloadId);
+  await Permission.storage.request();
 
   ALDownloader.download(downloadUrl.toString(), directoryPath: path, fileName: "$videoTitle.mp4",
       downloaderHandlerInterface: ALDownloaderHandlerInterface(progressHandler: (progress){

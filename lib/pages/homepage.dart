@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:media_player_plus/pages/settings.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../add_new_video_link_window.dart';
@@ -21,6 +22,8 @@ class _MyHomePageState extends State<MyHomePage> {
   var selectedIndex = 0;
 
   void _onItemTapped(int index) {
+    if(index == 1 || index == 2) return;
+
     setState(() {
       selectedIndex = index;
     });
@@ -30,7 +33,10 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     tabPages = <Widget>[
       MediaPlayerPage(videoFile: widget.videoFile),
+      SettingsPage(),
+      SettingsPage(),
       const FolderPage(),
+      SettingsPage()
     ];
     createFolders();
     super.initState();
@@ -55,9 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return SafeArea(
       child: Scaffold(
-          body: Center(
-            child: tabPages.elementAt(selectedIndex),
-          ),
+          body: tabPages.elementAt(selectedIndex),
           floatingActionButton: FloatingActionButton(
             onPressed: () => addNewVideoWindow(context),
             child: const Icon(Icons.add),
@@ -107,14 +111,28 @@ class CustomBottomNavigationBar extends StatelessWidget {
               items: <BottomNavigationBarItem>[
                 const BottomNavigationBarItem(
                   icon: Icon(Icons.music_note),
-                  label: 'Media Player',
+                  label: 'Player',
+                ),
+                BottomNavigationBarItem(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.primary,),
+                  label: ""
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.primary,),
+                  label: ""
                 ),
                 const BottomNavigationBarItem(
                   icon: Icon(Icons.folder),
                   label: 'Folder',
                 ),
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.settings),
+                  label: 'Settings',
+                ),
               ],
             ),
+
           ),
         ));
   }

@@ -23,10 +23,18 @@ class _FolderPageState extends State<FolderPage> {
     var dir = await getApplicationDocumentsDirectory();
     var youtubePath =  "${dir.path}/youtube";
     Directory youtubeDir = Directory(youtubePath);
+    List internFiles = await youtubeDir.list().toList();
+    List externFiles = [];
 
-    return await youtubeDir.list().toList();
+
+    var extDir = await getExternalStorageDirectory();
+    if(extDir != null) {
+      Directory youtubeExtDir = Directory("${extDir.path}/youtube");
+      externFiles = await youtubeExtDir.list().toList();
+    }
+
+    return internFiles + externFiles;
   }
-
 
 
   @override
