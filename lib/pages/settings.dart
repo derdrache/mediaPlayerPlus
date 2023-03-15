@@ -14,7 +14,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final mediaBox = Hive.box('mediaBox');
   List speicherPfad =  ["Interner Speicher", "SD-Karte"];
-  String speicherPfadSelected = "";
+  late String speicherPfadSelected;
 
   checkSDExist() async {
     Directory? externalDirectory  = await getExternalStorageDirectory();
@@ -26,6 +26,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
 @override
   void initState() {
+  speicherPfadSelected= mediaBox.get("speicherPfad") ?? "Interner Speicher";
+
     checkSDExist();
     super.initState();
   }
@@ -41,7 +43,7 @@ class _SettingsPageState extends State<SettingsPage> {
             Expanded(child: Text("Speicherpfad", style: TextStyle(fontSize: 20),),),
             SizedBox(width:5),
             DropdownButton(
-              value: mediaBox.get("speicherPfad"),
+              value: speicherPfadSelected,
                 items: speicherPfad.map<DropdownMenuItem>((value) {
                           return DropdownMenuItem<String>(
                             value: value,
