@@ -24,8 +24,13 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
   String videoTitle = video.title;
   Duration? videoDuration = video.duration;
   String videoImage = video.thumbnails.lowResUrl;
+  int maxTitleLength = 35;
+
   videoTitle = videoTitle.replaceAll("/", " ");
   videoTitle = videoTitle.replaceAll("|", " ");
+  if(videoTitle.length > maxTitleLength){
+    videoTitle = videoTitle.substring(0,maxTitleLength);
+  }
 
   final manifest = await yt.videos.streamsClient.getManifest(videoId);
   yt.close();
@@ -52,29 +57,34 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
   mediaBox.put("downloadId", downloadId);
   await Permission.storage.request();
 
-  ALDownloader.download(downloadUrl.toString(), directoryPath: path, fileName: "$videoTitle.mp4",
-      downloaderHandlerInterface: ALDownloaderHandlerInterface(progressHandler: (progress){
-        var hiveVideoData = mediaBox.get(videoTitle);
-        hiveVideoData["downloadStatus"] = (progress*100).round().toString();
-        mediaBox.put(videoTitle, hiveVideoData);
-        NotificationService().createNotification((progress*100).round(), downloadId, videoTitle);
-      }, succeededHandler: () {
-        var hiveVideoData = mediaBox.get(videoTitle);
-        hiveVideoData["status"] = "done";
-        hiveVideoData["downloadStatus"] = "100";
-        mediaBox.put(videoTitle, hiveVideoData);
-        debugPrint('ALDownloader | download succeeded\n');
-      }, failedHandler: () {
-        mediaBox.get(videoTitle)["status"] = "error";
-        ALDownloader.remove(downloadUrl.toString());
-        debugPrint('ALDownloader | download failed\n');
-      }, pausedHandler: () {
-        mediaBox.get(videoTitle)["status"] = "pause?";
-        debugPrint('ALDownloader | download paused}\n');
-      }),
-    redownloadIfNeeded: true
-  );
+  downloadManager(downloadUrl, videoTitle, path, downloadId);
 
+}
+
+downloadManager(downloadUrl, videoTitle, path, downloadId){
+  final mediaBox = Hive.box('mediaBox');
+
+  ALDownloader.download(downloadUrl.toString(), directoryPath: path, fileName: "$videoTitle.mp4",
+    downloaderHandlerInterface: ALDownloaderHandlerInterface(progressHandler: (progress){
+      var hiveVideoData = mediaBox.get(videoTitle);
+      hiveVideoData["downloadStatus"] = (progress*100).round().toString();
+      mediaBox.put(videoTitle, hiveVideoData);
+      NotificationService().createNotification((progress*100).round(), downloadId, videoTitle);
+    }, succeededHandler: () {
+      var hiveVideoData = mediaBox.get(videoTitle);
+      hiveVideoData["status"] = "done";
+      hiveVideoData["downloadStatus"] = "100";
+      mediaBox.put(videoTitle, hiveVideoData);
+      debugPrint('ALDownloader | download succeeded\n');
+    }, failedHandler: () {
+      mediaBox.get(videoTitle)["status"] = "error";
+      ALDownloader.remove(downloadUrl.toString());
+      debugPrint('ALDownloader | download failed\n');
+    }, pausedHandler: () {
+      mediaBox.get(videoTitle)["status"] = "pause?";
+      debugPrint('ALDownloader | download paused}\n');
+    }),
+  );
 }
 
 
