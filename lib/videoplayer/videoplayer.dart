@@ -51,9 +51,13 @@ class _OwnVideoPlayerState extends State<OwnVideoPlayer> {
     _videoController.addListener(() {
       var videoPosition = _videoController.value.position;
       if(videoPosition.inSeconds == 0){
-        mediaBox.get(videoTitle)["position"] = 0;
+        var videoData = mediaBox.get(videoTitle);
+        videoData["position"] = 0;
+        mediaBox.put(videoTitle,videoData);
       }else if(videoPosition.inSeconds > 20){
-        mediaBox.get(videoTitle)["position"] = videoPosition.inSeconds - 10;
+        var videoData = mediaBox.get(videoTitle);
+        videoData["position"] = videoPosition.inSeconds - 10;
+        mediaBox.put(videoTitle,videoData);
       }
 
 
