@@ -58,7 +58,13 @@ class _FolderPageState extends State<FolderPage> {
           margin: const EdgeInsets.all(10),
           child: Row(
             children: [
-              if(videoImage != "") Image.network(videoImage, scale: 1.3),
+              if(videoImage != "") Image.network(
+                  videoImage, scale: 1.3,
+                errorBuilder: (BuildContext context, Object exception,
+                    StackTrace? stackTrace) {
+                  return const Text('');
+                },
+              ),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
