@@ -13,15 +13,18 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final mediaBox = Hive.box('mediaBox');
-  List speicherPfad =  ["Interner Speicher", "SD-Karte"];
+  List speicherPfadBezeichnungen =  ["Interner Speicher", "SD-Karte"];
   late String speicherPfadSelected;
 
   checkSDExist() async {
-    Directory? externalDirectory  = await getExternalStorageDirectory();
+    var dirs  = await getExternalStorageDirectories();
 
-    if(externalDirectory != null) return;
+    if(dirs!.length > 1) return;
 
-    speicherPfad.removeLast();
+    setState(() {
+      speicherPfadBezeichnungen.removeLast();
+    });
+
   }
 
 @override
@@ -44,7 +47,7 @@ class _SettingsPageState extends State<SettingsPage> {
             SizedBox(width:5),
             DropdownButton(
               value: speicherPfadSelected,
-                items: speicherPfad.map<DropdownMenuItem>((value) {
+                items: speicherPfadBezeichnungen.map<DropdownMenuItem>((value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),

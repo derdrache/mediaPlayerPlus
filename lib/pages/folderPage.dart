@@ -2,9 +2,13 @@ import 'dart:io';
 
 import 'package:al_downloader/al_downloader.dart';
 import 'package:flutter/material.dart';
+import 'package:glob/list_local_fs.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:glob/glob.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:external_path/external_path.dart';
 
 import '../functions/formatDuration.dart';
 import 'homepage.dart';
@@ -19,23 +23,31 @@ class FolderPage extends StatefulWidget {
 class _FolderPageState extends State<FolderPage> {
   var mediaBox = Hive.box('mediaBox');
 
-  getAllVideos() async {
-    var dir = await getApplicationDocumentsDirectory();
-    var youtubePath =  "${dir.path}/youtube";
-    Directory youtubeDir = Directory(youtubePath);
-    List internFiles = await youtubeDir.list().toList();
-    List externFiles = [];
+  getAllMediaFiles() async {
+    var dirs = await getExternalStorageDirectories();
+    dirs = dirs!;
+    var youtubeFiles = [];
 
-
-    var extDir = await getExternalStorageDirectory();
-    if(extDir != null) {
-      Directory youtubeExtDir = Directory("${extDir.path}/youtube");
-      externFiles = await youtubeExtDir.list().toList();
+    for(var dir in dirs){
+      youtubeFiles = youtubeFiles + await getYoutubeFiles(dir);
     }
 
-    return internFiles + externFiles;
+    return youtubeFiles;
   }
 
+  getYoutubeFiles(dir) async {
+    var path =  "${dir.path}/youtube";
+    Directory youtubeDir = Directory(path);
+    return await youtubeDir.list().toList();
+
+  }
+
+
+  @override
+  void initState() {
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +129,7 @@ class _FolderPageState extends State<FolderPage> {
 
     showAllVideos(){
       return FutureBuilder(
-          future: getAllVideos(),
+          future: getAllMediaFiles(),
           builder: (context, AsyncSnapshot snapshot) {
             if(snapshot.data != null){
               var allVideos = snapshot.data!;

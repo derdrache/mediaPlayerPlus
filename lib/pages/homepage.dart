@@ -19,7 +19,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late List<Widget> tabPages;
-  var selectedIndex = 0;
+  var selectedIndex = 3;
 
   void _onItemTapped(int index) {
     if(index == 1 || index == 2) return;

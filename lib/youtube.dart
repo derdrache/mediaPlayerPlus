@@ -10,11 +10,10 @@ import 'notification.dart';
 
 Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = false}) async {
   final mediaBox = Hive.box('mediaBox');
-  Directory directory  = await getApplicationDocumentsDirectory();
-  Directory? externalDirectory  = await getExternalStorageDirectory();
+  var dirs = await getExternalStorageDirectories();
+  dirs = dirs!;
   var speicherPfad = mediaBox.get("speicherPfad") ?? "Interner Speicher";
-  var selectedDirectory = speicherPfad != "Interner Speicher" ? externalDirectory?.path : directory.path;
-
+  var selectedDirectory = speicherPfad == "Interner Speicher" ? dirs[0].path : dirs[1].path;
   String path = "$selectedDirectory/youtube/";
 
 

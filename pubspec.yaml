@@ -48,6 +48,8 @@ dependencies:
   al_downloader: ^1.7.2
   flutter_local_notifications: ^9.7.1
   permission_handler: ^10.2.0
+  glob: ^2.1.1
+  external_path: ^1.0.3
 
 dev_dependencies:
   flutter_test:
