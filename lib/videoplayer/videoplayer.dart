@@ -2,6 +2,7 @@ import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:video_player/video_player.dart';
+import 'package:wakelock/wakelock.dart';
 
 import 'controlls.dart';
 
@@ -27,11 +28,13 @@ class _OwnVideoPlayerState extends State<OwnVideoPlayer> {
   @override
   void initState() {
     super.initState();
+    Wakelock.enable();
     initVideoPlayer();
   }
 
   @override
   void dispose() {
+    Wakelock.disable();
     _videoController.dispose();
     super.dispose();
   }

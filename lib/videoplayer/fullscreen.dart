@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
+import 'package:wakelock/wakelock.dart';
 
 
 class VideoFullScreen extends StatefulWidget {
@@ -16,11 +17,18 @@ class _VideoFullScreenState extends State<VideoFullScreen> {
 
   @override
   void initState(){
+    Wakelock.enable();
     super.initState();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
     ]);
+  }
+
+  @override
+  void dispose() {
+    Wakelock.disable();
+    super.dispose();
   }
 
   @override

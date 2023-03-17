@@ -49,6 +49,7 @@ dependencies:
   flutter_local_notifications: ^9.7.1
   permission_handler: ^10.2.0
   external_path: ^1.0.3
+  wakelock: ^0.6.2
 
 dev_dependencies:
   flutter_test:

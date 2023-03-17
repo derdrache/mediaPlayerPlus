@@ -17,7 +17,6 @@ class MediaPlayerPage extends StatefulWidget {
 class _MediaPlayerPageState extends State<MediaPlayerPage> {
   var mediaBox = Hive.box('mediaBox');
 
-
   @override
   Widget build(BuildContext context) {
 
@@ -73,7 +72,6 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
         ),
       );
     }
-
 
     return Column(
       children: [
