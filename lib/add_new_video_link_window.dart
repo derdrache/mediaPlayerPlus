@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'youtube.dart';
+import 'functions/youtube.dart';
 
 addNewVideoWindow(context) {
   var videoQuality = "med";
