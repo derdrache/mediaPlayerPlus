@@ -23,7 +23,7 @@ class _FolderPageState extends State<FolderPage> {
   getAllMediaFiles() async {
     var dirs = await getExternalStorageDirectories();
     dirs = dirs!;
-    var youtubeFiles = [];
+    List youtubeFiles = [];
 
     for(var dir in dirs){
       youtubeFiles = youtubeFiles + await getYoutubeFiles(dir);
@@ -35,14 +35,13 @@ class _FolderPageState extends State<FolderPage> {
   }
 
   getYoutubeFiles(dir) async {
-    var path =  "${dir.path}/youtube";
+    String path =  "${dir.path}/youtube";
     Directory youtubeDir = Directory(path);
     return await youtubeDir.list().toList();
-
   }
 
   getAllStorageAudio()async{
-    var paths = await ExternalPath.getExternalStorageDirectories();
+    List paths = await ExternalPath.getExternalStorageDirectories();
     List allFiles = [];
 
     for(var path in paths){
@@ -58,30 +57,26 @@ class _FolderPageState extends State<FolderPage> {
     return allFiles;
   }
 
+  deleteVideo(videoTitle){
 
-  @override
-  void initState() {
-
-    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    getAllStorageAudio();
 
     createVideoDisplay(video){
-      var videoTitle = video.path.split("/").last.replaceAll(".mp4", "");
-      var videoData = mediaBox.get(videoTitle) ?? {};
-      var status = videoData["status"] ?? "";
+      String videoTitle = video.path.split("/").last.replaceAll(".mp4", "");
+      Map videoData = mediaBox.get(videoTitle) ?? {};
+      String status = videoData["status"] ?? "";
       Duration duration =  Duration(milliseconds: videoData["duration"] ?? 0);
-      var videoImage = videoData["image"] ?? "";
-      var downloadStatus = videoData["downloadStatus"];
-      var downloadUrl = videoData["url"];
+      String videoImage = videoData["image"] ?? "";
+      String downloadStatus = videoData["downloadStatus"];
+      String downloadUrl = videoData["url"];
 
       return InkWell(
         onTap: () {
           Navigator.pushReplacement(
-            context,MaterialPageRoute(builder: (context) => MyHomePage(videoFile: video)),);
+            context,MaterialPageRoute(builder: (context) => MyHomePage(selectedIndex: 0, videoFile: video)),);
         },
         child: Container(
           margin: const EdgeInsets.all(10),
@@ -167,7 +162,6 @@ class _FolderPageState extends State<FolderPage> {
           }
       );
     }
-
 
     return Column(
       children: [

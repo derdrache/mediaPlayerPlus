@@ -4,9 +4,9 @@ import 'package:flutter/services.dart';
 import 'functions/youtube.dart';
 
 addNewVideoWindow(context) {
-  var videoQuality = "med";
-  var onlySound = false;
-  var linkController = TextEditingController();
+  String videoQuality = "med";
+  bool onlySound = false;
+  TextEditingController linkController = TextEditingController();
 
   return showDialog(
       context: context,
@@ -17,7 +17,7 @@ addNewVideoWindow(context) {
               children: [
                 TextField(
                   controller: linkController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     hintText: 'Enter a Youtube link',
                   ),
@@ -32,12 +32,12 @@ addNewVideoWindow(context) {
                       linkController.text = copiedtext ?? "";
                     });
                   },
-                  icon: Icon(Icons.content_paste),
+                  icon: const Icon(Icons.content_paste),
                   iconSize: 30,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 CheckboxListTile(
-                    title: Text("low Quality"),
+                    title: const Text("low Quality"),
                     value: videoQuality.contains("low"),
                     onChanged: (value) {
                       if (value!) {
@@ -47,7 +47,7 @@ addNewVideoWindow(context) {
                       }
                     }),
                 CheckboxListTile(
-                    title: Text("med Quality"),
+                    title: const Text("med Quality"),
                     value: videoQuality.contains("med"),
                     onChanged: (value) {
                       if (value!) {
@@ -57,7 +57,7 @@ addNewVideoWindow(context) {
                       }
                     }),
                 CheckboxListTile(
-                    title: Text("high Quality"),
+                    title: const Text("high Quality"),
                     value: videoQuality.contains("high"),
                     onChanged: (value) {
                       if (value!) {
@@ -66,18 +66,18 @@ addNewVideoWindow(context) {
                         });
                       }
                     }),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 CheckboxListTile(
-                    title: Text("Sound only"),
+                    title: const Text("Sound only"),
                     value: onlySound,
                     onChanged: (value) {
                       windowState(() {
                         onlySound = value!;
                       });
                     }),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 FloatingActionButton.extended(
-                  label: Text("Download"),
+                  label: const Text("Download"),
                   onPressed: () {
                     bool isYouTubeLink = linkController.text.contains("youtu");
 

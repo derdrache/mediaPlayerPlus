@@ -14,11 +14,41 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
   dirs = dirs!;
   var speicherPfad = mediaBox.get("speicherPfad") ?? "Interner Speicher";
   var selectedDirectory = speicherPfad == "Interner Speicher" ? dirs[0].path : dirs[1].path;
-  String path = "$selectedDirectory/youtube/";
+  String savePath = "$selectedDirectory/youtube/";
+  Map youtubeVideoData = await getYoutubeVideoInformation(videoLink);
+  var youtubeManifest = youtubeVideoData["manifest"];
+  String youtubeTitle = youtubeVideoData["title"];
+  String youtubeImage = youtubeVideoData["image"];
+  Duration youtubeDuration = youtubeVideoData["duration"];
+  final soundonly = youtubeManifest.audioOnly.first;
+  Map videoQuality = {
+    "low": youtubeManifest.video.first,
+    "med": youtubeManifest.video[1],
+    "high": youtubeManifest.video[2]
+  };
+  File("$savePath$youtubeTitle.mp4");
+  final downloadUrl = onlySound ? soundonly.url : videoQuality[selectedVideoQuality]!.url;
+  int downloadId = mediaBox.get("downloadId")??0+1;
 
+  mediaBox.put(youtubeTitle,{
+    "status": "start",
+    "url": downloadUrl.toString(),
+    "downloadStatus": "0",
+    "duration": youtubeDuration.inMilliseconds,
+    "image": youtubeImage,
+    "id": downloadId
+  });
 
+  mediaBox.put("downloadId", downloadId);
+  await Permission.storage.request();
+
+  downloadManager(downloadUrl, youtubeTitle, savePath, downloadId);
+
+}
+
+getYoutubeVideoInformation(youtubeUrl) async {
   final yt = YoutubeExplode();
-  final video = await yt.videos.get(videoLink);
+  final video = await yt.videos.get(youtubeUrl);
   final videoId = video.id;
   String videoTitle = video.title;
   Duration? videoDuration = video.duration;
@@ -34,30 +64,12 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
   final manifest = await yt.videos.streamsClient.getManifest(videoId);
   yt.close();
 
-  final soundonly = manifest.audioOnly.first;
-  Map videoQuality = {
-    "low": manifest.video.first,
-    "med": manifest.video[1],
-    "high": manifest.video[2]
-  };
-  File("$path$videoTitle.mp4");
-  final downloadUrl = onlySound ? soundonly.url : videoQuality[selectedVideoQuality]!.url;
-  int downloadId = mediaBox.get("downloadId")??0+1;
-
-  mediaBox.put(videoTitle,{
-    "status": "start",
-    "url": downloadUrl.toString(),
-    "downloadStatus": "0",
-    "duration": videoDuration?.inMilliseconds,
+  return{
+    "title" : videoTitle,
+    "duration": videoDuration,
     "image": videoImage,
-    "id": downloadId
-  });
-
-  mediaBox.put("downloadId", downloadId);
-  await Permission.storage.request();
-
-  downloadManager(downloadUrl, videoTitle, path, downloadId);
-
+    "manifest": manifest
+  };
 }
 
 downloadManager(downloadUrl, videoTitle, path, downloadId){

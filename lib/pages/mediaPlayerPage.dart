@@ -17,22 +17,30 @@ class MediaPlayerPage extends StatefulWidget {
 class _MediaPlayerPageState extends State<MediaPlayerPage> {
   var mediaBox = Hive.box('mediaBox');
 
+  deleteFile(videoTitle) async {
+    await widget.videoFile.delete();
+    mediaBox.delete(videoTitle);
+    setState(() {
+      widget.videoFile = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
 
     videoInfoContainer(){
-      var videoTitle = widget.videoFile.path.split("/").last.replaceAll(".mp4", "");
-      var videoData = mediaBox.get(videoTitle) ?? {};
-      var status = videoData["status"] ?? "";
+      String videoTitle = widget.videoFile.path.split("/").last.replaceAll(".mp4", "");
+      Map videoData = mediaBox.get(videoTitle) ?? {};
+      String status = videoData["status"] ?? "";
       Duration duration =  Duration(milliseconds: videoData["duration"]);
-      var videoImage = videoData["image"] ?? "";
+      String videoImage = videoData["image"] ?? "";
 
       return Container(
         margin: const EdgeInsets.all(10),
         child: Row(
           children: [
             Image.network(videoImage, scale: 1.3),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,19 +48,13 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
                   Row(
                     children: [
                       Expanded(child: Text(
-                        videoTitle,maxLines: 2, style: TextStyle(
+                        videoTitle,maxLines: 2, style: const TextStyle(
                           fontSize: 20,
                       ),
                       )),
                       const SizedBox(width: 10),
                       IconButton(
-                          onPressed: () async {
-                            await widget.videoFile.delete();
-                            mediaBox.delete(videoTitle);
-                            setState(() {
-                              widget.videoFile = null;
-                            });
-                          },
+                          onPressed: () => deleteFile(videoTitle),
                           color: Colors.red,
                           iconSize: 30,
                           icon: const Icon(Icons.delete)
@@ -84,7 +86,7 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
             ),
             height: 220,
             width: double.infinity,
-            child: Center(
+            child: const Center(
               child: Text("Video auswählen oder neues Video hinzufügen"),
             ),
           ),
