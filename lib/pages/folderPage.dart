@@ -70,8 +70,8 @@ class _FolderPageState extends State<FolderPage> {
       String status = videoData["status"] ?? "";
       Duration duration =  Duration(milliseconds: videoData["duration"] ?? 0);
       String videoImage = videoData["image"] ?? "";
-      String downloadStatus = videoData["downloadStatus"];
-      String downloadUrl = videoData["url"];
+      String downloadStatus = videoData["downloadStatus"] ?? "";
+      String downloadUrl = videoData["url"] ?? "";
 
       return InkWell(
         onTap: () {

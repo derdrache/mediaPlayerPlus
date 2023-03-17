@@ -32,14 +32,14 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
       String videoTitle = widget.videoFile.path.split("/").last.replaceAll(".mp4", "");
       Map videoData = mediaBox.get(videoTitle) ?? {};
       String status = videoData["status"] ?? "";
-      Duration duration =  Duration(milliseconds: videoData["duration"]);
+      Duration duration =  Duration(milliseconds: videoData["duration"] ?? 0);
       String videoImage = videoData["image"] ?? "";
 
       return Container(
         margin: const EdgeInsets.all(10),
         child: Row(
           children: [
-            Image.network(videoImage, scale: 1.3),
+            if(videoImage.isNotEmpty) Image.network(videoImage, scale: 1.3),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
