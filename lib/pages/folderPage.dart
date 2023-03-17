@@ -2,12 +2,9 @@ import 'dart:io';
 
 import 'package:al_downloader/al_downloader.dart';
 import 'package:flutter/material.dart';
-import 'package:glob/list_local_fs.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:glob/glob.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:external_path/external_path.dart';
 
 import '../functions/formatDuration.dart';
@@ -32,7 +29,9 @@ class _FolderPageState extends State<FolderPage> {
       youtubeFiles = youtubeFiles + await getYoutubeFiles(dir);
     }
 
-    return youtubeFiles;
+    var allSystemFiles = await getAllStorageAudio();
+
+    return youtubeFiles + allSystemFiles;
   }
 
   getYoutubeFiles(dir) async {
@@ -40,6 +39,23 @@ class _FolderPageState extends State<FolderPage> {
     Directory youtubeDir = Directory(path);
     return await youtubeDir.list().toList();
 
+  }
+
+  getAllStorageAudio()async{
+    var paths = await ExternalPath.getExternalStorageDirectories();
+    List allFiles = [];
+
+    for(var path in paths){
+      var files = Directory(path).listSync(recursive: true, followLinks: false);
+
+      for(var file in files){
+        if(file.path.contains("Android")) continue;
+
+        if(file.path.endsWith('.mp3') || file.path.endsWith('.mp4')) allFiles.add(file);
+      }
+    }
+
+    return allFiles;
   }
 
 
@@ -51,6 +67,7 @@ class _FolderPageState extends State<FolderPage> {
 
   @override
   Widget build(BuildContext context) {
+    getAllStorageAudio();
 
     createVideoDisplay(video){
       var videoTitle = video.path.split("/").last.replaceAll(".mp4", "");
@@ -92,7 +109,7 @@ class _FolderPageState extends State<FolderPage> {
                         )),
                       ],
                     ),
-                    Row(
+                    if(videoData.isNotEmpty) Row(
                       children: [
                         Text("Status: $status - $downloadStatus % / "),
                         Text("${formatDuration(duration)}")
@@ -116,7 +133,7 @@ class _FolderPageState extends State<FolderPage> {
                   },
                   color: Colors.red,
                   iconSize: 30,
-                  icon: status == "done"
+                  icon: status == "done" || videoData.isEmpty
                       ? const Icon(Icons.delete)
                       : const Icon(Icons.file_download_off)
               )
