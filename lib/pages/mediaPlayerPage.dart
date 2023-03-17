@@ -25,11 +25,21 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
     });
   }
 
+  writeLocalDB(videoTitle){
+    if(mediaBox.get(videoTitle) != null ) return;
+
+    mediaBox.put(videoTitle, {
+      "typ": "ownMedia",
+      "position" : 0
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
 
     videoInfoContainer(){
       String videoTitle = widget.videoFile.path.split("/").last.replaceAll(".mp4", "");
+      writeLocalDB(videoTitle);
       Map videoData = mediaBox.get(videoTitle) ?? {};
       String status = videoData["status"] ?? "";
       Duration duration =  Duration(milliseconds: videoData["duration"] ?? 0);
@@ -63,8 +73,8 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
                   ),
                   Row(
                     children: [
-                      Text("Status: $status / "),
-                      Text("${formatDuration(duration)}")
+                      if(status.isNotEmpty) Text("Status: $status / "),
+                      if(duration.inMilliseconds != 0) Text("${formatDuration(duration)}")
                     ],
                   )
                 ],

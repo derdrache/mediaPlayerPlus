@@ -65,7 +65,6 @@ class _ControllsState extends State<Controlls> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.videoPlayer.value.isPlaying);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

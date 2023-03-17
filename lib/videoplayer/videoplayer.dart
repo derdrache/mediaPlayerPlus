@@ -6,8 +6,6 @@ import 'package:wakelock/wakelock.dart';
 
 import 'controlls.dart';
 
-
-
 class OwnVideoPlayer extends StatefulWidget {
   var mediaFile;
 

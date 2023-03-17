@@ -106,8 +106,8 @@ class _FolderPageState extends State<FolderPage> {
                     ),
                     if(videoData.isNotEmpty) Row(
                       children: [
-                        Text("Status: $status - $downloadStatus % / "),
-                        Text("${formatDuration(duration)}")
+                        if(status.isNotEmpty) Text("Status: $status - $downloadStatus % / "),
+                        if(duration.inMilliseconds != 0) Text("${formatDuration(duration)}")
                       ],
                     )
                   ],
@@ -128,7 +128,7 @@ class _FolderPageState extends State<FolderPage> {
                   },
                   color: Colors.red,
                   iconSize: 30,
-                  icon: status == "done" || videoData.isEmpty
+                  icon: status == "done" || videoData["typ"] == "ownMedia" || videoData.isEmpty
                       ? const Icon(Icons.delete)
                       : const Icon(Icons.file_download_off)
               )

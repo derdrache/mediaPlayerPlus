@@ -31,6 +31,7 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
   int downloadId = mediaBox.get("downloadId")??0+1;
 
   mediaBox.put(youtubeTitle,{
+    "typ": "youtube",
     "status": "start",
     "url": downloadUrl.toString(),
     "downloadStatus": "0",
