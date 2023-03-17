@@ -1,7 +1,7 @@
 # media_player_plus
 
 A media player with the ability to download YouTube videos, completely without ads and usable offline (after downloading the videos).
-
+Only for Android
 
 **features in progress:**
 - new Layout
