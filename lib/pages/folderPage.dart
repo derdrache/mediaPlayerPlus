@@ -6,6 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:external_path/external_path.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../functions/formatDuration.dart';
 import 'homepage.dart';
@@ -21,17 +22,9 @@ class _FolderPageState extends State<FolderPage> {
   var mediaBox = Hive.box('mediaBox');
 
   getAllMediaFiles() async {
-    var dirs = await getExternalStorageDirectories();
-    dirs = dirs!;
-    List youtubeFiles = [];
-
-    for(var dir in dirs){
-      youtubeFiles = youtubeFiles + await getYoutubeFiles(dir);
-    }
-
     var allSystemFiles = await getAllStorageAudio();
 
-    return youtubeFiles + allSystemFiles;
+    return allSystemFiles;
   }
 
   getYoutubeFiles(dir) async {
@@ -41,20 +34,33 @@ class _FolderPageState extends State<FolderPage> {
   }
 
   getAllStorageAudio()async{
-    List paths = await ExternalPath.getExternalStorageDirectories();
+    List mainPaths = await ExternalPath.getExternalStorageDirectories();
+    List searchPaths = [];
     List allFiles = [];
 
-    for(var path in paths){
-      var files = Directory(path).listSync(recursive: true, followLinks: false);
+    await Permission.storage.request();
 
-      for(var file in files){
-        if(file.path.contains("Android")) continue;
-
-        if(file.path.endsWith('.mp3') || file.path.endsWith('.mp4')) allFiles.add(file);
-      }
+    for(var path in mainPaths){
+      searchPaths.add("$path/Android/data/com.example.media_player_plus/files/youtube");
+      searchPaths.add("$path/Download");
+      searchPaths.add("$path/Movies");
+      searchPaths.add("$path/Audiobooks");
+      searchPaths.add("$path/Music");
+      searchPaths.add("$path/Podcasts");
     }
 
-    return allFiles;
+    for(var path in searchPaths){
+      try{
+        var files = Directory(path).listSync();
+
+        for(var file in files){
+          if(file.path.endsWith('.mp3') || file.path.endsWith('.mp4')) allFiles.add(file);
+        }
+      }catch(_){}
+
+    }
+
+    return allFiles.reversed;
   }
 
   deleteVideo(videoTitle){

@@ -41,7 +41,6 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
   });
 
   mediaBox.put("downloadId", downloadId);
-  await Permission.storage.request();
 
   downloadManager(downloadUrl, youtubeTitle, savePath, downloadId);
 
