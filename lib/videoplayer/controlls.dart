@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:media_player_plus/videoplayer/fullscreen.dart';
 import 'package:video_player/video_player.dart';
 import 'package:simple_pip_mode/simple_pip.dart';
-
-import '../pages/homepage.dart';
 
 class Controlls extends StatefulWidget {
   final VideoPlayerController videoPlayer;
@@ -21,32 +18,6 @@ class _ControllsState extends State<Controlls> {
   double mainIconSize = 50;
   double iconSize = 35;
   double speed = 1.0;
-  late var _pip;
-
-  @override
-  void initState() {
-    _pip = SimplePip(
-        onPipEntered: () {
-          print("start");
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => VideoFullScreen(videoPlayer: widget.videoPlayer)));
-        },
-        onPipExited: () async{
-          SystemChrome.setPreferredOrientations([
-            DeviceOrientation.portraitUp,
-            DeviceOrientation.portraitDown,
-          ]);
-
-          //await Future.delayed(Duration(milliseconds: 100));
-
-          Navigator.pushReplacement(
-            context,MaterialPageRoute(builder: (context) => MyHomePage(selectedIndex: 0, videoFile: widget.videoFile)),);
-
-        }
-
-    );
-    super.initState();
-  }
 
   play() {
     widget.videoPlayer.play();
@@ -121,7 +92,6 @@ class _ControllsState extends State<Controlls> {
             IconButton(
               iconSize: mainIconSize,
               icon: Icon(Icons.forward_10),
-              //IconBadge(icon: Icon(Icons.fast_forward), text: "+15"),
               onPressed: () => forward(),
             ),
 
@@ -131,7 +101,6 @@ class _ControllsState extends State<Controlls> {
           IconButton(
             iconSize: iconSize,
             icon: repeatOn ? Icon(Icons.repeat_on_outlined) : Icon(Icons.repeat),
-            //IconBadge(icon: Icon(Icons.fast_forward), text: "+15"),
             onPressed: () => repeat(!repeatOn),
           ),
           InkWell(
@@ -150,7 +119,6 @@ class _ControllsState extends State<Controlls> {
           IconButton(
             iconSize: mainIconSize - 10,
             icon: Icon(Icons.fullscreen),
-            //IconBadge(icon: Icon(Icons.fast_forward), text: "+15"),
             onPressed: (){
               Navigator.push(
                 context,
@@ -161,13 +129,11 @@ class _ControllsState extends State<Controlls> {
           IconButton(
             iconSize: iconSize,
             icon: Icon(Icons.picture_in_picture),
-            //IconBadge(icon: Icon(Icons.fast_forward), text: "+15"),
-            onPressed: () {
-              _pip.enterPipMode();
-            },
+            onPressed: () => SimplePip().enterPipMode(),
           ),
         ],)
       ],
     );
   }
 }
+

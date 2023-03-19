@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:media_player_plus/pages/settings.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:simple_pip_mode/pip_widget.dart';
 
 import '../add_new_video_link_window.dart';
 import 'folderPage.dart';
@@ -71,6 +72,22 @@ class _MyHomePageState extends State<MyHomePage> {
     ];
 
     return SafeArea(
+        child: PipWidget(
+          builder: (context) => Scaffold(
+              body: tabPages.elementAt(widget.selectedIndex),
+              floatingActionButton: FloatingActionButton(
+                onPressed: () => addNewVideoWindow(context, update),
+                child: const Icon(Icons.add),
+              ),
+              floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
+              bottomNavigationBar: CustomBottomNavigationBar(
+                onNavigationItemTapped: _onItemTapped,
+                selectNavigationItem: widget.selectedIndex,
+              )),
+          pipChild: Scaffold(body:  MediaPlayerPage(videoFile: widget.videoFile, videoOnly: true)),
+        )
+        /*
       child: Scaffold(
           body: tabPages.elementAt(widget.selectedIndex),
           floatingActionButton: FloatingActionButton(
@@ -83,6 +100,8 @@ class _MyHomePageState extends State<MyHomePage> {
             onNavigationItemTapped: _onItemTapped,
             selectNavigationItem: widget.selectedIndex,
           )),
+
+         */
     );
   }
 }

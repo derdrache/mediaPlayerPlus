@@ -107,3 +107,4 @@ class _OwnVideoPlayerState extends State<OwnVideoPlayer> {
     );
   }
 }
+
