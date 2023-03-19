@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:media_player_plus/videoplayer/fullscreen.dart';
 import 'package:video_player/video_player.dart';
+import 'package:simple_pip_mode/simple_pip.dart';
 
 class Controlls extends StatefulWidget {
   final VideoPlayerController videoPlayer;
@@ -13,7 +14,8 @@ class Controlls extends StatefulWidget {
 
 class _ControllsState extends State<Controlls> {
   bool repeatOn = false;
-  double iconSize = 50;
+  double mainIconSize = 50;
+  double iconSize = 35;
   double speed = 1.0;
 
   play() {
@@ -65,60 +67,73 @@ class _ControllsState extends State<Controlls> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
       children: [
-        IconButton(
-            icon: Icon(Icons.replay_10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+                icon: Icon(Icons.replay_10),
+                iconSize: mainIconSize,
+                onPressed: () => rewind()),
+            IconButton(
+              onPressed: () {
+                widget.videoPlayer.value.isPlaying
+                    ? widget.videoPlayer.pause()
+                    : widget.videoPlayer.play();
+              },
+              iconSize: mainIconSize,
+              icon: Icon(widget.videoPlayer.value.isPlaying
+                  ? Icons.pause
+                  : Icons.play_arrow),
+            ),
+            IconButton(
+              iconSize: mainIconSize,
+              icon: Icon(Icons.forward_10),
+              //IconBadge(icon: Icon(Icons.fast_forward), text: "+15"),
+              onPressed: () => forward(),
+            ),
+
+          ],
+        ),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          IconButton(
             iconSize: iconSize,
-            onPressed: () => rewind()),
-        IconButton(
-          onPressed: () {
-            widget.videoPlayer.value.isPlaying
-                ? widget.videoPlayer.pause()
-                : widget.videoPlayer.play();
-          },
-          iconSize: iconSize,
-          icon: Icon(widget.videoPlayer.value.isPlaying
-              ? Icons.pause
-              : Icons.play_arrow),
-        ),
-        IconButton(
-          iconSize: iconSize,
-          icon: Icon(Icons.forward_10),
-          //IconBadge(icon: Icon(Icons.fast_forward), text: "+15"),
-          onPressed: () => forward(),
-        ),
-        IconButton(
-          iconSize: iconSize - 10,
-          icon: repeatOn ? Icon(Icons.repeat_on_outlined) : Icon(Icons.repeat),
-          //IconBadge(icon: Icon(Icons.fast_forward), text: "+15"),
-          onPressed: () => repeat(!repeatOn),
-        ),
-        InkWell(
-          onTap: () => changeSpeed(),
-          child: Container(
-            width: iconSize - 15,
-            height: iconSize - 15,
-            decoration: BoxDecoration(border: Border.all(width: 2)),
-            child: Center(
-                child: Text(
-                  speed.toString() + "x",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            )),
+            icon: repeatOn ? Icon(Icons.repeat_on_outlined) : Icon(Icons.repeat),
+            //IconBadge(icon: Icon(Icons.fast_forward), text: "+15"),
+            onPressed: () => repeat(!repeatOn),
           ),
-        ),
-        IconButton(
-          iconSize: iconSize - 10,
-          icon: Icon(Icons.fullscreen),
-          //IconBadge(icon: Icon(Icons.fast_forward), text: "+15"),
-          onPressed: (){
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => VideoFullScreen(videoPlayer: widget.videoPlayer)),
-            );
-          },
-        ),
+          InkWell(
+            onTap: () => changeSpeed(),
+            child: Container(
+              width: iconSize,
+              height: iconSize,
+              decoration: BoxDecoration(border: Border.all(width: 2)),
+              child: Center(
+                  child: Text(
+                    speed.toString() + "x",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )),
+            ),
+          ),
+          IconButton(
+            iconSize: mainIconSize - 10,
+            icon: Icon(Icons.fullscreen),
+            //IconBadge(icon: Icon(Icons.fast_forward), text: "+15"),
+            onPressed: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => VideoFullScreen(videoPlayer: widget.videoPlayer)),
+              );
+            },
+          ),
+          IconButton(
+            iconSize: iconSize,
+            icon: Icon(Icons.picture_in_picture),
+            //IconBadge(icon: Icon(Icons.fast_forward), text: "+15"),
+            onPressed: () => SimplePip().enterPipMode(),
+          ),
+        ],)
       ],
     );
   }
