@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:media_player_plus/videoplayer/fullscreen.dart';
 import 'package:video_player/video_player.dart';
 import 'package:simple_pip_mode/simple_pip.dart';
 
+import '../pages/homepage.dart';
+
 class Controlls extends StatefulWidget {
   final VideoPlayerController videoPlayer;
+  var videoFile;
 
-  const Controlls({Key? key, required this.videoPlayer}) : super(key: key);
+  Controlls({Key? key, required this.videoPlayer, this.videoFile = ""}) : super(key: key);
 
   @override
   State<Controlls> createState() => _ControllsState();
@@ -17,6 +21,32 @@ class _ControllsState extends State<Controlls> {
   double mainIconSize = 50;
   double iconSize = 35;
   double speed = 1.0;
+  late var _pip;
+
+  @override
+  void initState() {
+    _pip = SimplePip(
+        onPipEntered: () {
+          print("start");
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => VideoFullScreen(videoPlayer: widget.videoPlayer)));
+        },
+        onPipExited: () async{
+          SystemChrome.setPreferredOrientations([
+            DeviceOrientation.portraitUp,
+            DeviceOrientation.portraitDown,
+          ]);
+
+          //await Future.delayed(Duration(milliseconds: 100));
+
+          Navigator.pushReplacement(
+            context,MaterialPageRoute(builder: (context) => MyHomePage(selectedIndex: 0, videoFile: widget.videoFile)),);
+
+        }
+
+    );
+    super.initState();
+  }
 
   play() {
     widget.videoPlayer.play();
@@ -64,6 +94,7 @@ class _ControllsState extends State<Controlls> {
       speed = newSpeed;
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +162,9 @@ class _ControllsState extends State<Controlls> {
             iconSize: iconSize,
             icon: Icon(Icons.picture_in_picture),
             //IconBadge(icon: Icon(Icons.fast_forward), text: "+15"),
-            onPressed: () => SimplePip().enterPipMode(),
+            onPressed: () {
+              _pip.enterPipMode();
+            },
           ),
         ],)
       ],
