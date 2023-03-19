@@ -57,7 +57,6 @@ class _FolderPageState extends State<FolderPage> {
 
   @override
   Widget build(BuildContext context) {
-    print("refresh folder page");
 
     createVideoDisplay(video){
       String videoTitle = video.path.split("/").last.replaceAll(".mp4", "");

@@ -57,10 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   update(){
-    setState(() {
-
-    });
-    print("update");
+    setState(() {});
   }
 
   @override
