@@ -2,14 +2,14 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:al_downloader/al_downloader.dart';
 
 import 'notification.dart';
 
+final mediaBox = Hive.box('mediaBox');
+
 Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = false}) async {
-  final mediaBox = Hive.box('mediaBox');
   var dirs = await getExternalStorageDirectories();
   dirs = dirs!;
   var speicherPfad = mediaBox.get("speicherPfad") ?? "Interner Speicher";
@@ -27,13 +27,13 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
     "high": youtubeManifest.video[2]
   };
   File("$savePath$youtubeTitle.mp4");
-  final downloadUrl = onlySound ? soundonly.url : videoQuality[selectedVideoQuality]!.url;
+  final downloadStream = onlySound ? soundonly : videoQuality[selectedVideoQuality]!;
   int downloadId = mediaBox.get("downloadId")??0+1;
 
   mediaBox.put(youtubeTitle,{
     "typ": "youtube",
     "status": "start",
-    "url": downloadUrl.toString(),
+    "url": downloadStream.url.toString(),
     "downloadStatus": "0",
     "duration": youtubeDuration.inMilliseconds,
     "image": youtubeImage,
@@ -42,7 +42,7 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
 
   mediaBox.put("downloadId", downloadId);
 
-  downloadManager(downloadUrl, youtubeTitle, savePath, downloadId);
+  downloadManager(downloadStream, youtubeTitle, savePath, downloadId);
 
 }
 
@@ -72,10 +72,9 @@ getYoutubeVideoInformation(youtubeUrl) async {
   };
 }
 
-downloadManager(downloadUrl, videoTitle, path, downloadId){
-  final mediaBox = Hive.box('mediaBox');
+downloadManager(downloadStream, videoTitle, path, downloadId){
 
-  ALDownloader.download(downloadUrl.toString(), directoryPath: path, fileName: "$videoTitle.mp4",
+  ALDownloader.download(downloadStream.url.toString(), directoryPath: path, fileName: "$videoTitle.mp4",
     downloaderHandlerInterface: ALDownloaderHandlerInterface(progressHandler: (progress){
       var hiveVideoData = mediaBox.get(videoTitle);
       hiveVideoData["downloadStatus"] = (progress*100).round().toString();
@@ -89,8 +88,9 @@ downloadManager(downloadUrl, videoTitle, path, downloadId){
       debugPrint('ALDownloader | download succeeded\n');
     }, failedHandler: () {
       mediaBox.get(videoTitle)["status"] = "error";
-      ALDownloader.remove(downloadUrl.toString());
+      ALDownloader.remove(downloadStream.url.toString());
       debugPrint('ALDownloader | download failed\n');
+      downloadYouTubePlugin(downloadStream, path, videoTitle);
     }, pausedHandler: () {
       mediaBox.get(videoTitle)["status"] = "pause?";
       debugPrint('ALDownloader | download paused}\n');
@@ -98,4 +98,21 @@ downloadManager(downloadUrl, videoTitle, path, downloadId){
   );
 }
 
+downloadYouTubePlugin(streamInfo, path, videoTitle) async{
+  var yt = YoutubeExplode();
+  var stream = yt.videos.streamsClient.get(streamInfo);
+
+  var file = File("$path$videoTitle.mp4");
+  var fileStream = file.openWrite();
+
+  await stream.pipe(fileStream);
+
+  await fileStream.flush();
+  await fileStream.close();
+
+  var hiveVideoData = mediaBox.get(videoTitle);
+  hiveVideoData["status"] = "done";
+  hiveVideoData["downloadStatus"] = "100";
+  mediaBox.put(videoTitle, hiveVideoData);
+}
 
