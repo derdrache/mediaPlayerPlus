@@ -87,21 +87,6 @@ class _MyHomePageState extends State<MyHomePage> {
               )),
           pipChild: Scaffold(body:  MediaPlayerPage(videoFile: widget.videoFile, videoOnly: true)),
         )
-        /*
-      child: Scaffold(
-          body: tabPages.elementAt(widget.selectedIndex),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => addNewVideoWindow(context, update),
-            child: const Icon(Icons.add),
-          ),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerDocked,
-          bottomNavigationBar: CustomBottomNavigationBar(
-            onNavigationItemTapped: _onItemTapped,
-            selectNavigationItem: widget.selectedIndex,
-          )),
-
-         */
     );
   }
 }
