@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'functions/youtube.dart';
 
-addNewVideoWindow(context) {
+addNewVideoWindow(context, update) {
   String videoQuality = "med";
   bool onlySound = false;
   TextEditingController linkController = TextEditingController();
@@ -88,7 +88,7 @@ addNewVideoWindow(context) {
                       return;
                     }
 
-                    downloadVideo(linkController.text, videoQuality,
+                    downloadVideo(linkController.text, videoQuality, update,
                         onlySound: onlySound);
 
                     Navigator.pop(context);

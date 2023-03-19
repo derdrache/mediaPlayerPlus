@@ -89,7 +89,7 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
       children: [
         if(widget.videoFile != null) OwnVideoPlayer(mediaFile: widget.videoFile),
         if(widget.videoFile == null) InkWell(
-          onTap: () => addNewVideoWindow(context),
+          onTap: () => addNewVideoWindow(context, null),
           child: Container(
             decoration: BoxDecoration(
               border: Border.all()

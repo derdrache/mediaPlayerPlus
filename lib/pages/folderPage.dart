@@ -11,7 +11,7 @@ import '../functions/formatDuration.dart';
 import 'homepage.dart';
 
 class FolderPage extends StatefulWidget {
-  const FolderPage({Key? key}) : super(key: key);
+  FolderPage({Key? key}) : super(key: key);
 
   @override
   State<FolderPage> createState() => _FolderPageState();
@@ -57,6 +57,7 @@ class _FolderPageState extends State<FolderPage> {
 
   @override
   Widget build(BuildContext context) {
+    print("refresh folder page");
 
     createVideoDisplay(video){
       String videoTitle = video.path.split("/").last.replaceAll(".mp4", "");

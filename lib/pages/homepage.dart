@@ -35,7 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
       MediaPlayerPage(videoFile: widget.videoFile),
       const SizedBox.shrink(),
       const SizedBox.shrink(),
-      const FolderPage(),
+      FolderPage(),
       const SettingsPage()
     ];
     createFolders();
@@ -56,13 +56,28 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  update(){
+    setState(() {
+
+    });
+    print("update");
+  }
+
   @override
   Widget build(BuildContext context) {
+    tabPages = <Widget>[
+      MediaPlayerPage(videoFile: widget.videoFile),
+      const SizedBox.shrink(),
+      const SizedBox.shrink(),
+      FolderPage(),
+      const SettingsPage()
+    ];
+
     return SafeArea(
       child: Scaffold(
           body: tabPages.elementAt(widget.selectedIndex),
           floatingActionButton: FloatingActionButton(
-            onPressed: () => addNewVideoWindow(context),
+            onPressed: () => addNewVideoWindow(context, update),
             child: const Icon(Icons.add),
           ),
           floatingActionButtonLocation:

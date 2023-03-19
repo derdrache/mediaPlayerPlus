@@ -9,7 +9,7 @@ import 'notification.dart';
 
 final mediaBox = Hive.box('mediaBox');
 
-Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = false}) async {
+Future<void> downloadVideo(String videoLink, selectedVideoQuality, update, {onlySound = false}) async {
   var dirs = await getExternalStorageDirectories();
   dirs = dirs!;
   var speicherPfad = mediaBox.get("speicherPfad") ?? "Interner Speicher";
@@ -42,7 +42,7 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, {onlySound = 
 
   mediaBox.put("downloadId", downloadId);
 
-  downloadManager(downloadStream, youtubeTitle, savePath, downloadId);
+  downloadManager(downloadStream, youtubeTitle, savePath, downloadId, update);
 
 }
 
@@ -72,7 +72,7 @@ getYoutubeVideoInformation(youtubeUrl) async {
   };
 }
 
-downloadManager(downloadStream, videoTitle, path, downloadId){
+downloadManager(downloadStream, videoTitle, path, downloadId, update){
 
   ALDownloader.download(downloadStream.url.toString(), directoryPath: path, fileName: "$videoTitle.mp4",
     downloaderHandlerInterface: ALDownloaderHandlerInterface(progressHandler: (progress){
@@ -85,12 +85,13 @@ downloadManager(downloadStream, videoTitle, path, downloadId){
       hiveVideoData["status"] = "done";
       hiveVideoData["downloadStatus"] = "100";
       mediaBox.put(videoTitle, hiveVideoData);
+      update();
       debugPrint('ALDownloader | download succeeded\n');
     }, failedHandler: () {
       mediaBox.get(videoTitle)["status"] = "error";
       ALDownloader.remove(downloadStream.url.toString());
       debugPrint('ALDownloader | download failed\n');
-      downloadYouTubePlugin(downloadStream, path, videoTitle);
+      downloadYouTubePlugin(downloadStream, path, videoTitle, update);
     }, pausedHandler: () {
       mediaBox.get(videoTitle)["status"] = "pause?";
       debugPrint('ALDownloader | download paused}\n');
@@ -98,7 +99,7 @@ downloadManager(downloadStream, videoTitle, path, downloadId){
   );
 }
 
-downloadYouTubePlugin(streamInfo, path, videoTitle) async{
+downloadYouTubePlugin(streamInfo, path, videoTitle, update) async{
   var yt = YoutubeExplode();
   var stream = yt.videos.streamsClient.get(streamInfo);
 
@@ -114,5 +115,7 @@ downloadYouTubePlugin(streamInfo, path, videoTitle) async{
   hiveVideoData["status"] = "done";
   hiveVideoData["downloadStatus"] = "100";
   mediaBox.put(videoTitle, hiveVideoData);
+
+  update();
 }
 
