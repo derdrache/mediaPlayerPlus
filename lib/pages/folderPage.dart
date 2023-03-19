@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:al_downloader/al_downloader.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:external_path/external_path.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -21,19 +20,8 @@ class FolderPage extends StatefulWidget {
 class _FolderPageState extends State<FolderPage> {
   var mediaBox = Hive.box('mediaBox');
 
-  getAllMediaFiles() async {
-    var allSystemFiles = await getAllStorageAudio();
 
-    return allSystemFiles;
-  }
-
-  getYoutubeFiles(dir) async {
-    String path =  "${dir.path}/youtube";
-    Directory youtubeDir = Directory(path);
-    return await youtubeDir.list().toList();
-  }
-
-  getAllStorageAudio()async{
+  getAllMediaFiles()async{
     List mainPaths = await ExternalPath.getExternalStorageDirectories();
     List searchPaths = [];
     List allFiles = [];
