@@ -3,14 +3,15 @@ import 'dart:io';
 import 'package:al_downloader/al_downloader.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:external_path/external_path.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../functions/formatDuration.dart';
 import 'homepage.dart';
 
 class FolderPage extends StatefulWidget {
-  const FolderPage({Key? key}) : super(key: key);
+  FolderPage({Key? key}) : super(key: key);
 
   @override
   State<FolderPage> createState() => _FolderPageState();
@@ -19,40 +20,57 @@ class FolderPage extends StatefulWidget {
 class _FolderPageState extends State<FolderPage> {
   var mediaBox = Hive.box('mediaBox');
 
-  getAllVideos() async {
-    var dir = await getApplicationDocumentsDirectory();
-    var youtubePath =  "${dir.path}/youtube";
-    Directory youtubeDir = Directory(youtubePath);
-    List internFiles = await youtubeDir.list().toList();
-    List externFiles = [];
 
+  getAllMediaFiles()async{
+    List mainPaths = await ExternalPath.getExternalStorageDirectories();
+    List searchPaths = [];
+    List allFiles = [];
 
-    var extDir = await getExternalStorageDirectory();
-    if(extDir != null) {
-      Directory youtubeExtDir = Directory("${extDir.path}/youtube");
-      externFiles = await youtubeExtDir.list().toList();
+    await Permission.storage.request();
+
+    for(var path in mainPaths){
+      searchPaths.add("$path/Android/data/com.example.media_player_plus/files/youtube");
+      searchPaths.add("$path/Download");
+      searchPaths.add("$path/Movies");
+      searchPaths.add("$path/Audiobooks");
+      searchPaths.add("$path/Music");
+      searchPaths.add("$path/Podcasts");
     }
 
-    return internFiles + externFiles;
+    for(var path in searchPaths){
+      try{
+        var files = Directory(path).listSync();
+
+        for(var file in files){
+          if(file.path.endsWith('.mp3') || file.path.endsWith('.mp4')) allFiles.add(file);
+        }
+      }catch(_){}
+
+    }
+
+    return allFiles.reversed;
   }
 
+  deleteVideo(videoTitle){
+
+  }
 
   @override
   Widget build(BuildContext context) {
 
     createVideoDisplay(video){
-      var videoTitle = video.path.split("/").last.replaceAll(".mp4", "");
-      var videoData = mediaBox.get(videoTitle) ?? {};
-      var status = videoData["status"] ?? "";
+      String videoTitle = video.path.split("/").last.replaceAll(".mp4", "");
+      Map videoData = mediaBox.get(videoTitle) ?? {};
+      String status = videoData["status"] ?? "";
       Duration duration =  Duration(milliseconds: videoData["duration"] ?? 0);
-      var videoImage = videoData["image"] ?? "";
-      var downloadStatus = videoData["downloadStatus"];
-      var downloadUrl = videoData["url"];
+      String videoImage = videoData["image"] ?? "";
+      String downloadStatus = videoData["downloadStatus"] ?? "";
+      String downloadUrl = videoData["url"] ?? "";
 
       return InkWell(
         onTap: () {
           Navigator.pushReplacement(
-            context,MaterialPageRoute(builder: (context) => MyHomePage(videoFile: video)),);
+            context,MaterialPageRoute(builder: (context) => MyHomePage(selectedIndex: 0, videoFile: video)),);
         },
         child: Container(
           margin: const EdgeInsets.all(10),
@@ -80,10 +98,10 @@ class _FolderPageState extends State<FolderPage> {
                         )),
                       ],
                     ),
-                    Row(
+                    if(videoData.isNotEmpty) Row(
                       children: [
-                        Text("Status: $status - $downloadStatus % / "),
-                        Text("${formatDuration(duration)}")
+                        if(status.isNotEmpty) Text("Status: $status - $downloadStatus % / "),
+                        if(duration.inMilliseconds != 0) Text("${formatDuration(duration)}")
                       ],
                     )
                   ],
@@ -104,7 +122,7 @@ class _FolderPageState extends State<FolderPage> {
                   },
                   color: Colors.red,
                   iconSize: 30,
-                  icon: status == "done"
+                  icon: status == "done" || videoData["typ"] == "ownMedia" || videoData.isEmpty
                       ? const Icon(Icons.delete)
                       : const Icon(Icons.file_download_off)
               )
@@ -117,7 +135,7 @@ class _FolderPageState extends State<FolderPage> {
 
     showAllVideos(){
       return FutureBuilder(
-          future: getAllVideos(),
+          future: getAllMediaFiles(),
           builder: (context, AsyncSnapshot snapshot) {
             if(snapshot.data != null){
               var allVideos = snapshot.data!;
@@ -138,7 +156,6 @@ class _FolderPageState extends State<FolderPage> {
           }
       );
     }
-
 
     return Column(
       children: [

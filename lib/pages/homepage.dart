@@ -10,8 +10,9 @@ import 'mediaPlayerPage.dart';
 
 class MyHomePage extends StatefulWidget {
   var videoFile;
+  int selectedIndex;
 
-  MyHomePage({super.key, this.videoFile});
+  MyHomePage({super.key, this.videoFile, this.selectedIndex = 3});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -19,13 +20,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late List<Widget> tabPages;
-  var selectedIndex = 0;
 
   void _onItemTapped(int index) {
     if(index == 1 || index == 2) return;
 
     setState(() {
-      selectedIndex = index;
+      widget.selectedIndex = index;
     });
   }
 
@@ -33,10 +33,10 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     tabPages = <Widget>[
       MediaPlayerPage(videoFile: widget.videoFile),
-      SettingsPage(),
-      SettingsPage(),
-      const FolderPage(),
-      SettingsPage()
+      const SizedBox.shrink(),
+      const SizedBox.shrink(),
+      FolderPage(),
+      const SettingsPage()
     ];
     createFolders();
     super.initState();
@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   createYoutubeFolder(directory) async {
-    var youtubePath = "${directory.path}/youtube";
+    String youtubePath = "${directory.path}/youtube";
     final checkPathExistence = await Directory(youtubePath).exists();
 
     if (!checkPathExistence) {
@@ -56,21 +56,32 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  update(){
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
+    tabPages = <Widget>[
+      MediaPlayerPage(videoFile: widget.videoFile),
+      const SizedBox.shrink(),
+      const SizedBox.shrink(),
+      FolderPage(),
+      const SettingsPage()
+    ];
 
     return SafeArea(
       child: Scaffold(
-          body: tabPages.elementAt(selectedIndex),
+          body: tabPages.elementAt(widget.selectedIndex),
           floatingActionButton: FloatingActionButton(
-            onPressed: () => addNewVideoWindow(context),
+            onPressed: () => addNewVideoWindow(context, update),
             child: const Icon(Icons.add),
           ),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerDocked,
           bottomNavigationBar: CustomBottomNavigationBar(
             onNavigationItemTapped: _onItemTapped,
-            selectNavigationItem: selectedIndex,
+            selectNavigationItem: widget.selectedIndex,
           )),
     );
   }

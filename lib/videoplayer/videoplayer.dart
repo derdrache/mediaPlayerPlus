@@ -2,10 +2,9 @@ import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:video_player/video_player.dart';
+import 'package:wakelock/wakelock.dart';
 
 import 'controlls.dart';
-
-
 
 class OwnVideoPlayer extends StatefulWidget {
   var mediaFile;
@@ -27,18 +26,20 @@ class _OwnVideoPlayerState extends State<OwnVideoPlayer> {
   @override
   void initState() {
     super.initState();
+    Wakelock.enable();
     initVideoPlayer();
   }
 
   @override
   void dispose() {
+    Wakelock.disable();
     _videoController.dispose();
     super.dispose();
   }
 
   initVideoPlayer() {
     var videoTitle = widget.mediaFile.path.split("/").last.replaceAll(".mp4", "");
-    var savedPosition = Duration(seconds: mediaBox.get(videoTitle)["position"] ?? 0);
+    var savedPosition = Duration(seconds: mediaBox.get(videoTitle)?["position"] ?? 0);
 
     _videoController = VideoPlayerController.file(widget.mediaFile,
         videoPlayerOptions: VideoPlayerOptions(allowBackgroundPlayback: true))
@@ -49,13 +50,13 @@ class _OwnVideoPlayerState extends State<OwnVideoPlayer> {
       });
 
     _videoController.addListener(() {
+      var videoData = mediaBox.get(videoTitle);
+
       var videoPosition = _videoController.value.position;
-      if(videoPosition.inSeconds == 0){
-        var videoData = mediaBox.get(videoTitle);
+      if(videoPosition.inSeconds == 0 && videoData != null){
         videoData["position"] = 0;
         mediaBox.put(videoTitle,videoData);
-      }else if(videoPosition.inSeconds > 20){
-        var videoData = mediaBox.get(videoTitle);
+      }else if(videoPosition.inSeconds > 20&& videoData != null){
         videoData["position"] = videoPosition.inSeconds - 10;
         mediaBox.put(videoTitle,videoData);
       }
@@ -74,7 +75,6 @@ class _OwnVideoPlayerState extends State<OwnVideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-
     return Column(
       children: [
         Center(
