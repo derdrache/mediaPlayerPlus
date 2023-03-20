@@ -157,7 +157,8 @@ class _FolderPageState extends State<FolderPage> {
       );
     }
 
-    return Column(
+    return ListView(
+      shrinkWrap: true,
       children: [
         showAllVideos(),
       ],
