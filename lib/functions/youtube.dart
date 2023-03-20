@@ -79,6 +79,7 @@ downloadManager(downloadStream, videoTitle, path, downloadId, update){
       hiveVideoData["downloadStatus"] = (progress*100).round().toString();
       mediaBox.put(videoTitle, hiveVideoData);
       NotificationService().createNotification((progress*100).round(), downloadId, videoTitle);
+
     }, succeededHandler: () {
       var hiveVideoData = mediaBox.get(videoTitle);
       hiveVideoData["status"] = "done";
@@ -90,7 +91,7 @@ downloadManager(downloadStream, videoTitle, path, downloadId, update){
       mediaBox.get(videoTitle)["status"] = "error";
       ALDownloader.remove(downloadStream.url.toString());
       debugPrint('ALDownloader | download failed\n');
-      downloadYouTubePlugin(downloadStream, path, videoTitle, update);
+      downloadYouTubePlugin(downloadStream, path, videoTitle, update, downloadId);
     }, pausedHandler: () {
       mediaBox.get(videoTitle)["status"] = "pause?";
       debugPrint('ALDownloader | download paused}\n');
@@ -98,7 +99,7 @@ downloadManager(downloadStream, videoTitle, path, downloadId, update){
   );
 }
 
-downloadYouTubePlugin(streamInfo, path, videoTitle, update) async{
+downloadYouTubePlugin(streamInfo, path, videoTitle, update, downloadId) async{
   var yt = YoutubeExplode();
   var stream = yt.videos.streamsClient.get(streamInfo);
 
@@ -107,15 +108,14 @@ downloadYouTubePlugin(streamInfo, path, videoTitle, update) async{
 
   await stream.pipe(fileStream);
 
-  var hiveVideoData = mediaBox.get(videoTitle);
-  print(hiveVideoData);
-  hiveVideoData["status"] = "done";
-  hiveVideoData["downloadStatus"] = "100";
-  mediaBox.put(videoTitle, hiveVideoData);
-
   await fileStream.flush();
   await fileStream.close();
 
+  var hiveVideoData = mediaBox.get(videoTitle);
+  hiveVideoData["status"] = "done";
+  hiveVideoData["downloadStatus"] = "100";
+  mediaBox.put(videoTitle, hiveVideoData);
+  NotificationService().createNotification(100, downloadId, videoTitle);
   update();
 }
 
