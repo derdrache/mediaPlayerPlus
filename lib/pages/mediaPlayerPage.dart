@@ -7,8 +7,9 @@ import '../videoplayer/videoplayer.dart';
 
 class MediaPlayerPage extends StatefulWidget {
   var videoFile;
+  bool videoOnly;
 
-  MediaPlayerPage({Key? key, this.videoFile}) : super(key: key);
+  MediaPlayerPage({Key? key, this.videoFile, this.videoOnly = false}) : super(key: key);
 
   @override
   State<MediaPlayerPage> createState() => _MediaPlayerPageState();
@@ -33,6 +34,8 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
       "position" : 0
     });
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +91,7 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
     return Column(
       children: [
         if(widget.videoFile != null) OwnVideoPlayer(mediaFile: widget.videoFile),
-        if(widget.videoFile == null) InkWell(
+        if(widget.videoFile == null && !widget.videoOnly) InkWell(
           onTap: () => addNewVideoWindow(context, null),
           child: Container(
             decoration: BoxDecoration(
@@ -101,7 +104,7 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
             ),
           ),
         ),
-        if(widget.videoFile != null) videoInfoContainer()
+        if(widget.videoFile != null && !widget.videoOnly) videoInfoContainer()
       ],
     );
   }

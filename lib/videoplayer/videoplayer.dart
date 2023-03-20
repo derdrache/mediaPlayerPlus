@@ -100,9 +100,11 @@ class _OwnVideoPlayerState extends State<OwnVideoPlayer> {
           margin: EdgeInsets.all(10),
           child: Controlls(
             videoPlayer: _videoController,
+            videoFile: widget.mediaFile,
           ),
         ),
       ],
     );
   }
 }
+

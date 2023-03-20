@@ -108,13 +108,13 @@ downloadYouTubePlugin(streamInfo, path, videoTitle, update) async{
 
   await stream.pipe(fileStream);
 
-  await fileStream.flush();
-  await fileStream.close();
-
   var hiveVideoData = mediaBox.get(videoTitle);
   hiveVideoData["status"] = "done";
   hiveVideoData["downloadStatus"] = "100";
   mediaBox.put(videoTitle, hiveVideoData);
+
+  await fileStream.flush();
+  await fileStream.close();
 
   update();
 }

@@ -50,6 +50,7 @@ dependencies:
   permission_handler: ^10.2.0
   external_path: ^1.0.3
   wakelock: ^0.6.2
+  simple_pip_mode: ^0.8.0
 
 dev_dependencies:
   flutter_test:
