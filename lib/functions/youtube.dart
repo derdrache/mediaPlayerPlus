@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
+import 'package:media_player_plus/functions/sanitizeFilename.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:al_downloader/al_downloader.dart';
@@ -50,13 +51,11 @@ getYoutubeVideoInformation(youtubeUrl) async {
   final yt = YoutubeExplode();
   final video = await yt.videos.get(youtubeUrl);
   final videoId = video.id;
-  String videoTitle = video.title;
+  String videoTitle = sanitizeFilename(video.title);
   Duration? videoDuration = video.duration;
   String videoImage = video.thumbnails.lowResUrl;
   int maxTitleLength = 35;
 
-  videoTitle = videoTitle.replaceAll("/", " ");
-  videoTitle = videoTitle.replaceAll("|", " ");
   if(videoTitle.length > maxTitleLength){
     videoTitle = videoTitle.substring(0,maxTitleLength);
   }
@@ -109,6 +108,7 @@ downloadYouTubePlugin(streamInfo, path, videoTitle, update) async{
   await stream.pipe(fileStream);
 
   var hiveVideoData = mediaBox.get(videoTitle);
+  print(hiveVideoData);
   hiveVideoData["status"] = "done";
   hiveVideoData["downloadStatus"] = "100";
   mediaBox.put(videoTitle, hiveVideoData);
