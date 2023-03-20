@@ -48,7 +48,7 @@ class _FolderPageState extends State<FolderPage> {
 
     }
 
-    return allFiles.reversed;
+    return allFiles;
   }
 
   deleteVideo(videoTitle){
