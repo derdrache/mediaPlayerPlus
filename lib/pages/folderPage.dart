@@ -111,7 +111,7 @@ class _FolderPageState extends State<FolderPage> {
                   setState(() {});
 
                   Navigator.pop(context);
-                }, child: const Text("speichern"))
+                }, child: const Text("Speichern", style: TextStyle(fontSize: 18),))
               ],
             );
           });
