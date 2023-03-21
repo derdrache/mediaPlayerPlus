@@ -70,10 +70,15 @@ class _FolderPageState extends State<FolderPage> {
   renameFile(newName, videoFile){
     String path = (videoFile.path.split("/")..removeLast()).join("/") + "/";
     String ending = videoFile.path.split(".").last;
+    String oldTitle = videoFile.path.split("/").last;
+    oldTitle = oldTitle.substring(0,oldTitle.length -4);
 
     if(newName.isEmpty) return;
 
     newName = sanitizeFilename(newName);
+    var oldMediaData = mediaBox.get(oldTitle);
+    mediaBox.put(newName, oldMediaData);
+    mediaBox.delete(oldTitle);
 
     videoFile.rename("${path + newName}.$ending");
   }
