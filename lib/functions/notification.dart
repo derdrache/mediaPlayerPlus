@@ -45,4 +45,8 @@ class NotificationService {
         notificationBody, platformChannelSpecifics,
         payload: 'item x');
   }
+
+  void remove(int id){
+    _flutterLocalNotificationsPlugin.cancel(id);
+  }
 }

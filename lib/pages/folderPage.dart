@@ -48,7 +48,7 @@ class _FolderPageState extends State<FolderPage> {
 
     }
 
-    return allFiles.reversed;
+    return allFiles;
   }
 
   deleteVideo(videoTitle){
@@ -157,7 +157,8 @@ class _FolderPageState extends State<FolderPage> {
       );
     }
 
-    return Column(
+    return ListView(
+      shrinkWrap: true,
       children: [
         showAllVideos(),
       ],
