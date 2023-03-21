@@ -100,6 +100,9 @@ downloadManager(downloadStream, videoTitle, path, downloadId, update){
 }
 
 downloadYouTubePlugin(streamInfo, path, videoTitle, update, downloadId) async{
+
+  NotificationService().createNotification(25, downloadId, videoTitle);
+
   var yt = YoutubeExplode();
   var stream = yt.videos.streamsClient.get(streamInfo);
 
