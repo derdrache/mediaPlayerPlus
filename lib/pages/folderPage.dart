@@ -9,6 +9,7 @@ import 'package:external_path/external_path.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../functions/formatDuration.dart';
+import '../functions/sanitizeFilename.dart';
 import 'homepage.dart';
 
 class FolderPage extends StatefulWidget {
@@ -66,8 +67,51 @@ class _FolderPageState extends State<FolderPage> {
 
   }
 
+  renameFile(newName, videoFile){
+    String path = (videoFile.path.split("/")..removeLast()).join("/") + "/";
+    String ending = videoFile.path.split(".").last;
+
+    if(newName.isEmpty) return;
+
+    newName = sanitizeFilename(newName);
+
+    videoFile.rename("${path + newName}.$ending");
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    renameFileWindow(video) {
+      TextEditingController nameController = TextEditingController();
+
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return SimpleDialog(
+              title: const Center(child: Text("Datei umbenennen")),
+              children: [
+                Container(
+                  margin: const EdgeInsets.all(10),
+                  child: TextField(
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'Neuen Namen eingeben',
+                    ),
+                  ),
+                ),
+                TextButton(onPressed: (){
+                  renameFile(nameController.text, video);
+
+                  setState(() {});
+
+                  Navigator.pop(context);
+                }, child: const Text("speichern"))
+              ],
+            );
+          });
+
+    }
 
     createVideoDisplay(video){
       String videoTitle = video.path.split("/").last.replaceAll(".mp4", "");
@@ -83,6 +127,7 @@ class _FolderPageState extends State<FolderPage> {
           Navigator.pushReplacement(
             context,MaterialPageRoute(builder: (context) => MyHomePage(selectedIndex: 0, videoFile: video)),);
         },
+        onLongPress: () => renameFileWindow(video),
         child: Container(
           margin: const EdgeInsets.all(10),
           child: Row(
@@ -152,9 +197,11 @@ class _FolderPageState extends State<FolderPage> {
               var allVideos = snapshot.data!;
               List<Widget> videosContainerList = [];
 
+
               for(var video in allVideos){
                 videosContainerList.add(createVideoDisplay(video));
               }
+
 
               return ListView(
                 shrinkWrap: true,
@@ -167,6 +214,8 @@ class _FolderPageState extends State<FolderPage> {
           }
       );
     }
+
+
 
     return Column(
       children: [
@@ -189,12 +238,7 @@ class _FolderPageState extends State<FolderPage> {
           ),
         ),
         const SizedBox(height:20),
-        Expanded(child: ListView(
-          shrinkWrap: true,
-          children: [
-            showAllVideos(),
-          ],
-        ))
+        Expanded(child: showAllVideos())
       ],
     );
   }
