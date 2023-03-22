@@ -76,11 +76,15 @@ class _FolderPageState extends State<FolderPage> {
     if(newName.isEmpty) return;
 
     newName = sanitizeFilename(newName);
+
     var oldMediaData = mediaBox.get(oldTitle);
     mediaBox.put(newName, oldMediaData);
     mediaBox.delete(oldTitle);
 
-    videoFile.rename("${path + newName}.$ending");
+
+    videoFile.copy("${path + newName}.$ending");
+    videoFile.delete();
+
   }
 
   @override
