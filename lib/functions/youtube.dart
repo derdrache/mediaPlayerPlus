@@ -86,11 +86,7 @@ downloadManager(downloadStream, videoTitle, path, downloadId, update){
       hiveVideoData["downloadStatus"] = "100";
       mediaBox.put(videoTitle, hiveVideoData);
       update();
-      debugPrint('ALDownloader | download succeeded\n');
     }, failedHandler: () {
-      mediaBox.get(videoTitle)["status"] = "error";
-      ALDownloader.remove(downloadStream.url.toString());
-      debugPrint('ALDownloader | download failed\n');
       downloadYouTubePlugin(downloadStream, path, videoTitle, update, downloadId);
     }, pausedHandler: () {
       mediaBox.get(videoTitle)["status"] = "pause?";

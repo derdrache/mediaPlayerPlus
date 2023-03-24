@@ -63,10 +63,6 @@ class _FolderPageState extends State<FolderPage> {
     return allFiles;
   }
 
-  deleteVideo(videoTitle){
-
-  }
-
   renameFile(newName, videoFile){
     String path = (videoFile.path.split("/")..removeLast()).join("/") + "/";
     String ending = videoFile.path.split(".").last;
@@ -81,9 +77,7 @@ class _FolderPageState extends State<FolderPage> {
     mediaBox.put(newName, oldMediaData);
     mediaBox.delete(oldTitle);
 
-
-    videoFile.copy("${path + newName}.$ending");
-    videoFile.delete();
+    videoFile.rename("${path + newName}.$ending");
 
   }
 
@@ -175,12 +169,13 @@ class _FolderPageState extends State<FolderPage> {
               const SizedBox(width: 10),
               IconButton(
                   onPressed: () async {
-                    if(status != "done"){
+                    if(status != "done" && status.isNotEmpty){
                       ALDownloader.cancel(downloadUrl);
                       FlutterLocalNotificationsPlugin().cancel(videoData["id"]);
                     }
 
-                    await video.delete();
+                    await Permission.storage.request();
+                    video.deleteSync();
                     mediaBox.delete(videoTitle);
 
                     setState(() {});
