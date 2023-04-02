@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_background/flutter_background.dart';
 import 'package:media_player_plus/videoplayer/fullscreen.dart';
 import 'package:video_player/video_player.dart';
 import 'package:simple_pip_mode/simple_pip.dart';
@@ -79,10 +80,14 @@ class _ControllsState extends State<Controlls> {
                 iconSize: mainIconSize,
                 onPressed: () => rewind()),
             IconButton(
-              onPressed: () {
-                widget.videoPlayer.value.isPlaying
-                    ? widget.videoPlayer.pause()
-                    : widget.videoPlayer.play();
+              onPressed: () async{
+                if(widget.videoPlayer.value.isPlaying){
+                  widget.videoPlayer.pause();
+                  await FlutterBackground.disableBackgroundExecution();
+                }else {
+                  widget.videoPlayer.play();
+                  await FlutterBackground.enableBackgroundExecution();
+                }
               },
               iconSize: mainIconSize,
               icon: Icon(widget.videoPlayer.value.isPlaying
