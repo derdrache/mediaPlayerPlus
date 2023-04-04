@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:simple_pip_mode/actions/pip_action.dart';
+import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
 import 'package:simple_pip_mode/pip_widget.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock/wakelock.dart';
@@ -154,7 +155,8 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
             ],
           ),
         ),
-      pipChild: Scaffold(body: SingleChildScrollView(child:videoPlayerWidget)),
+      pipChild: Scaffold(body: SingleChildScrollView(child: Expanded(child:videoPlayerWidget))),
+      pipLayout: PipActionsLayout.media_only_pause,
       onPipAction: (action){
         switch (action) {
           case PipAction.play:
