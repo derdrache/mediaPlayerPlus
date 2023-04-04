@@ -70,6 +70,7 @@ class _ControllsState extends State<Controlls> {
 
   @override
   Widget build(BuildContext context) {
+
     return Column(
       children: [
         Row(
@@ -88,6 +89,8 @@ class _ControllsState extends State<Controlls> {
                   widget.videoPlayer.play();
                   await FlutterBackground.enableBackgroundExecution();
                 }
+
+                setState(() {});
               },
               iconSize: mainIconSize,
               icon: Icon(widget.videoPlayer.value.isPlaying

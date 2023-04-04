@@ -10,7 +10,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../functions/formatDuration.dart';
 import '../functions/sanitizeFilename.dart';
-import 'homepage.dart';
+import 'mediaPlayerPage.dart';
 
 class FolderPage extends StatefulWidget {
   FolderPage({Key? key}) : super(key: key);
@@ -127,8 +127,8 @@ class _FolderPageState extends State<FolderPage> {
 
       return InkWell(
         onTap: () {
-          Navigator.pushReplacement(
-            context,MaterialPageRoute(builder: (context) => MyHomePage(selectedIndex: 0, videoFile: video)),);
+          Navigator.push(
+            context,MaterialPageRoute(builder: (context) => MediaPlayerPage(videoFile: video)),);
         },
         onLongPress: () => renameFileWindow(video),
         child: Container(
