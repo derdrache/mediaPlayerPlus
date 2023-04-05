@@ -9,9 +9,8 @@ import 'folderPage.dart';
 
 class MyHomePage extends StatefulWidget {
   var videoFile;
-  int selectedIndex;
 
-  MyHomePage({super.key, this.videoFile, this.selectedIndex = 0});
+  MyHomePage({super.key, this.videoFile});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -19,10 +18,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late List<Widget> tabPages;
+  var selectedIndex = 0;
 
   void _onItemTapped(int index) {
     setState(() {
-      widget.selectedIndex = index;
+      selectedIndex = index;
     });
   }
 
@@ -63,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return SafeArea(
       child: Scaffold(
-          body: tabPages.elementAt(widget.selectedIndex),
+          body: tabPages.elementAt(selectedIndex),
           floatingActionButton: FloatingActionButton(
             onPressed: () => addNewVideoWindow(context, update),
             child: const Icon(Icons.add),
@@ -72,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
           FloatingActionButtonLocation.centerDocked,
           bottomNavigationBar: CustomBottomNavigationBar(
             onNavigationItemTapped: _onItemTapped,
-            selectNavigationItem: widget.selectedIndex,
+            selectNavigationItem: selectedIndex,
           )),
     );
   }
@@ -92,7 +92,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
         shape: const CircularNotchedRectangle(),
         notchMargin: 8.0,
         clipBehavior: Clip.antiAlias,
-        child: Container(
+        child: SizedBox(
           height: kBottomNavigationBarHeight,
           child: Container(
             decoration: const BoxDecoration(
@@ -110,11 +110,11 @@ class CustomBottomNavigationBar extends StatelessWidget {
               currentIndex: selectNavigationItem,
               selectedItemColor: Colors.white,
               onTap: onNavigationItemTapped,
-              items: <BottomNavigationBarItem>[
-                const BottomNavigationBarItem(icon: Icon(Icons.folder),
+              items: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(icon: Icon(Icons.folder),
                   label: 'Folder',
                 ),
-                const BottomNavigationBarItem(
+                BottomNavigationBarItem(
                   icon: Icon(Icons.settings),
                   label: 'Settings',
                 ),

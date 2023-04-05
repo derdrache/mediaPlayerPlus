@@ -155,7 +155,7 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
             ],
           ),
         ),
-      pipChild: Scaffold(body: SingleChildScrollView(child: Expanded(child:videoPlayerWidget))),
+      pipChild: Scaffold(body: videoPlayerWidget),
       pipLayout: PipActionsLayout.media_only_pause,
       onPipAction: (action){
         switch (action) {
