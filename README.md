@@ -7,4 +7,3 @@ Only for Android
 - new Layout
 - improve of download speed at low quality
 - process external link sharing directly in the app
-- picture in picture function
