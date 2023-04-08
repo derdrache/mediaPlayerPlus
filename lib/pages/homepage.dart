@@ -3,17 +3,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:media_player_plus/pages/settings.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:simple_pip_mode/pip_widget.dart';
 
 import '../add_new_video_link_window.dart';
 import 'folderPage.dart';
-import 'mediaPlayerPage.dart';
 
 class MyHomePage extends StatefulWidget {
   var videoFile;
-  int selectedIndex;
 
-  MyHomePage({super.key, this.videoFile, this.selectedIndex = 3});
+  MyHomePage({super.key, this.videoFile});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -21,21 +18,17 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late List<Widget> tabPages;
+  var selectedIndex = 0;
 
   void _onItemTapped(int index) {
-    if(index == 1 || index == 2) return;
-
     setState(() {
-      widget.selectedIndex = index;
+      selectedIndex = index;
     });
   }
 
   @override
   void initState() {
     tabPages = <Widget>[
-      MediaPlayerPage(videoFile: widget.videoFile),
-      const SizedBox.shrink(),
-      const SizedBox.shrink(),
       FolderPage(),
       const SettingsPage()
     ];
@@ -64,29 +57,23 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     tabPages = <Widget>[
-      MediaPlayerPage(videoFile: widget.videoFile),
-      const SizedBox.shrink(),
-      const SizedBox.shrink(),
       FolderPage(),
       const SettingsPage()
     ];
 
     return SafeArea(
-        child: PipWidget(
-          builder: (context) => Scaffold(
-              body: tabPages.elementAt(widget.selectedIndex),
-              floatingActionButton: FloatingActionButton(
-                onPressed: () => addNewVideoWindow(context, update),
-                child: const Icon(Icons.add),
-              ),
-              floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerDocked,
-              bottomNavigationBar: CustomBottomNavigationBar(
-                onNavigationItemTapped: _onItemTapped,
-                selectNavigationItem: widget.selectedIndex,
-              )),
-          pipChild: Scaffold(body:  MediaPlayerPage(videoFile: widget.videoFile, videoOnly: true)),
-        )
+      child: Scaffold(
+          body: tabPages.elementAt(selectedIndex),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => addNewVideoWindow(context, update),
+            child: const Icon(Icons.add),
+          ),
+          floatingActionButtonLocation:
+          FloatingActionButtonLocation.centerDocked,
+          bottomNavigationBar: CustomBottomNavigationBar(
+            onNavigationItemTapped: _onItemTapped,
+            selectNavigationItem: selectedIndex,
+          )),
     );
   }
 }
@@ -105,7 +92,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
         shape: const CircularNotchedRectangle(),
         notchMargin: 8.0,
         clipBehavior: Clip.antiAlias,
-        child: Container(
+        child: SizedBox(
           height: kBottomNavigationBarHeight,
           child: Container(
             decoration: const BoxDecoration(
@@ -123,25 +110,11 @@ class CustomBottomNavigationBar extends StatelessWidget {
               currentIndex: selectNavigationItem,
               selectedItemColor: Colors.white,
               onTap: onNavigationItemTapped,
-              items: <BottomNavigationBarItem>[
-                const BottomNavigationBarItem(
-                  icon: Icon(Icons.music_note),
-                  label: 'Player',
-                ),
-                BottomNavigationBarItem(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.primary,),
-                  label: ""
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.primary,),
-                  label: ""
-                ),
-                const BottomNavigationBarItem(
-                  icon: Icon(Icons.folder),
+              items: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(icon: Icon(Icons.folder),
                   label: 'Folder',
                 ),
-                const BottomNavigationBarItem(
+                BottomNavigationBarItem(
                   icon: Icon(Icons.settings),
                   label: 'Settings',
                 ),

@@ -48,6 +48,8 @@ Future<void> downloadVideo(String videoLink, selectedVideoQuality, update, {only
 }
 
 getYoutubeVideoInformation(youtubeUrl) async {
+  youtubeUrl = checkLink(youtubeUrl);
+
   final yt = YoutubeExplode();
   final video = await yt.videos.get(youtubeUrl);
   final videoId = video.id;
@@ -118,3 +120,11 @@ downloadYouTubePlugin(streamInfo, path, videoTitle, update, downloadId) async{
   update();
 }
 
+checkLink(youtubeUrl){
+  if(youtubeUrl.contains("live")){
+    String videoId = youtubeUrl.split("/").last.split("?").first;
+    return "https://www.youtube.com/watch?v=$videoId";
+  }
+
+  return youtubeUrl;
+}

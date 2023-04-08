@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:simple_pip_mode/actions/pip_action.dart';
+import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
+import 'package:simple_pip_mode/pip_widget.dart';
+import 'package:video_player/video_player.dart';
+import 'package:wakelock/wakelock.dart';
 import '../add_new_video_link_window.dart';
 import '../functions/formatDuration.dart';
 import '../videoplayer/videoplayer.dart';
@@ -7,9 +12,8 @@ import '../videoplayer/videoplayer.dart';
 
 class MediaPlayerPage extends StatefulWidget {
   var videoFile;
-  bool videoOnly;
 
-  MediaPlayerPage({Key? key, this.videoFile, this.videoOnly = false}) : super(key: key);
+  MediaPlayerPage({Key? key, this.videoFile}) : super(key: key);
 
   @override
   State<MediaPlayerPage> createState() => _MediaPlayerPageState();
@@ -17,6 +21,40 @@ class MediaPlayerPage extends StatefulWidget {
 
 class _MediaPlayerPageState extends State<MediaPlayerPage> {
   var mediaBox = Hive.box('mediaBox');
+  late VideoPlayerController _videoController;
+  late var videoPlayerWidget;
+
+
+  @override
+  void initState() {
+    super.initState();
+    Wakelock.enable();
+    initVideoPlayer();
+    videoPlayerWidget = OwnVideoPlayer(mediaFile: widget.videoFile, videoController: _videoController,);
+  }
+
+
+  @override
+  void dispose() {
+    Wakelock.disable();
+    _videoController.dispose();
+    super.dispose();
+  }
+
+  initVideoPlayer() {
+    var videoTitle = widget.videoFile.path.split("/").last.replaceAll(".mp4", "");
+    var savedPosition = Duration(seconds: mediaBox.get(videoTitle)?["position"] ?? 0);
+
+    _videoController = VideoPlayerController.file(widget.videoFile,
+        videoPlayerOptions: VideoPlayerOptions(allowBackgroundPlayback: true))
+      ..initialize().then((_) {
+        setState(() {
+          _videoController.seekTo(savedPosition);
+        });
+      });
+
+    _videoController.play();
+  }
 
   deleteFile(videoTitle) async {
     await widget.videoFile.delete();
@@ -88,24 +126,47 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
       );
     }
 
-    return Column(
-      children: [
-        if(widget.videoFile != null) OwnVideoPlayer(mediaFile: widget.videoFile),
-        if(widget.videoFile == null && !widget.videoOnly) InkWell(
-          onTap: () => addNewVideoWindow(context, null),
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all()
-            ),
-            height: 220,
-            width: double.infinity,
-            child: const Center(
-              child: Text("Video auswählen oder neues Video hinzufügen"),
-            ),
+    return PipWidget(
+        builder: (context) =>Scaffold(
+          appBar: AppBar(
+              title: Text("Video"),
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => Navigator.of(context).pop(),
+              )
+          ),
+          body: Column(
+            children: [
+              if(widget.videoFile != null) videoPlayerWidget,
+              if(widget.videoFile == null) InkWell(
+                onTap: () => addNewVideoWindow(context, null),
+                child: Container(
+                  decoration: BoxDecoration(
+                      border: Border.all()
+                  ),
+                  height: 220,
+                  width: double.infinity,
+                  child: const Center(
+                    child: Text("Video auswählen oder neues Video hinzufügen"),
+                  ),
+                ),
+              ),
+              if(widget.videoFile != null) videoInfoContainer()
+            ],
           ),
         ),
-        if(widget.videoFile != null && !widget.videoOnly) videoInfoContainer()
-      ],
+      pipChild: Scaffold(body: videoPlayerWidget),
+      pipLayout: PipActionsLayout.media_only_pause,
+      onPipAction: (action){
+        switch (action) {
+          case PipAction.play:
+            _videoController.play();
+            break;
+          case PipAction.pause:
+            _videoController.pause();
+            break;
+        }
+      },
     );
   }
 }

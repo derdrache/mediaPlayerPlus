@@ -10,7 +10,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../functions/formatDuration.dart';
 import '../functions/sanitizeFilename.dart';
-import 'homepage.dart';
+import 'mediaPlayerPage.dart';
 
 class FolderPage extends StatefulWidget {
   FolderPage({Key? key}) : super(key: key);
@@ -45,13 +45,11 @@ class _FolderPageState extends State<FolderPage> {
         searchPaths.add("$path/Movies/Telegram");
         searchPaths.add("$path/Music/Telegram");
       }
-
-
     }
 
     for(var path in searchPaths){
       try{
-        var files = Directory(path).listSync();
+        var files = Directory(path).listSync(recursive: true);
 
         for(var file in files){
           if(file.path.endsWith('.mp3') || file.path.endsWith('.mp4')) allFiles.add(file);
@@ -127,8 +125,8 @@ class _FolderPageState extends State<FolderPage> {
 
       return InkWell(
         onTap: () {
-          Navigator.pushReplacement(
-            context,MaterialPageRoute(builder: (context) => MyHomePage(selectedIndex: 0, videoFile: video)),);
+          Navigator.push(
+            context,MaterialPageRoute(builder: (context) => MediaPlayerPage(videoFile: video)),);
         },
         onLongPress: () => renameFileWindow(video),
         child: Container(

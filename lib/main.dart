@@ -3,10 +3,20 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:al_downloader/al_downloader.dart';
 import 'functions/notification.dart';
+import 'package:flutter_background/flutter_background.dart';
 
 import 'pages/homepage.dart';
 
 void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  const androidConfig = FlutterBackgroundAndroidConfig(
+    notificationTitle: "flutter_background example app",
+    notificationText: "Background notification for keeping the example app running in the background",
+    notificationImportance: AndroidNotificationImportance.Default,
+    notificationIcon: AndroidResource(name: 'background_icon', defType: 'drawable'), // Default is ic_launcher from folder mipmap
+  );
+  await FlutterBackground.initialize(androidConfig: androidConfig);
+
   await hiveInit();
   ALDownloader.initialize();
   NotificationService().init();
