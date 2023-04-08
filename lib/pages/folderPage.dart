@@ -45,13 +45,11 @@ class _FolderPageState extends State<FolderPage> {
         searchPaths.add("$path/Movies/Telegram");
         searchPaths.add("$path/Music/Telegram");
       }
-
-
     }
 
     for(var path in searchPaths){
       try{
-        var files = Directory(path).listSync();
+        var files = Directory(path).listSync(recursive: true);
 
         for(var file in files){
           if(file.path.endsWith('.mp3') || file.path.endsWith('.mp4')) allFiles.add(file);

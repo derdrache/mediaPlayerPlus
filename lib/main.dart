@@ -9,7 +9,7 @@ import 'pages/homepage.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  final androidConfig = FlutterBackgroundAndroidConfig(
+  const androidConfig = FlutterBackgroundAndroidConfig(
     notificationTitle: "flutter_background example app",
     notificationText: "Background notification for keeping the example app running in the background",
     notificationImportance: AndroidNotificationImportance.Default,
