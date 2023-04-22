@@ -22,6 +22,7 @@ class FolderPage extends StatefulWidget {
 class _FolderPageState extends State<FolderPage> {
   var mediaBox = Hive.box('mediaBox');
   int _selectedFolder = 0;
+  var mainColor = 0xFF5c00d2;
 
 
   getSelectedMediaFiles(select)async{
@@ -150,15 +151,19 @@ class _FolderPageState extends State<FolderPage> {
                         Expanded(child: Text(
                           videoTitle,maxLines: 2, style: const TextStyle(
                             fontSize: 20,
-                            color: Colors.black
+                            color: Colors.white
                         ),
                         )),
                       ],
                     ),
                     if(videoData.isNotEmpty) Row(
                       children: [
-                        if(status.isNotEmpty) Text("Status: $status - $downloadStatus % / "),
-                        if(duration.inMilliseconds != 0) Text("${formatDuration(duration)}")
+                        if(status.isNotEmpty) Text("Status: $status - $downloadStatus % / ", style: const TextStyle(
+                            color: Colors.white
+                        )),
+                        if(duration.inMilliseconds != 0) Text("${formatDuration(duration)}", style: const TextStyle(
+                            color: Colors.white
+                        ))
                       ],
                     )
                   ],
@@ -227,9 +232,9 @@ class _FolderPageState extends State<FolderPage> {
           height: 50,
           child: CupertinoSegmentedControl(
               children: const {
-                0: Text("YouTube"),
-                1: Text("Own Media"),
-                2: Text("Telegram"),
+                0: Text("YouTube", style: TextStyle(color: Colors.black)),
+                1: Text("Own Media", style: TextStyle(color: Colors.black)),
+                2: Text("Telegram", style: TextStyle(color: Colors.black)),
               },
               groupValue: _selectedFolder,
               onValueChanged: (newValue){

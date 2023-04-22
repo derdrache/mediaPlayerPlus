@@ -41,14 +41,14 @@ class _SettingsPageState extends State<SettingsPage> {
         shrinkWrap: true,
         children: [
           Row(children: [
-            const Expanded(child: Text("Speicherpfad", style: TextStyle(fontSize: 20),),),
+            const Expanded(child: Text("Speicherpfad", style: TextStyle(fontSize: 20, color: Colors.white),),),
             const SizedBox(width:5),
             DropdownButton(
               value: speicherPfadSelected,
                 items: speicherPfadBezeichnungen.map<DropdownMenuItem>((value) {
                           return DropdownMenuItem<String>(
                             value: value,
-                            child: Text(value),
+                            child: Text(value, style: TextStyle(color: Colors.white),),
                           );
                 }).toList(),
                 onChanged: (value){

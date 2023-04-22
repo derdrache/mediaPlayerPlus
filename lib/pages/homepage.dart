@@ -63,6 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return SafeArea(
       child: Scaffold(
+          backgroundColor: Color(0xFF5c00d2),
           body: tabPages.elementAt(selectedIndex),
           floatingActionButton: FloatingActionButton(
             onPressed: () => addNewVideoWindow(context, update),

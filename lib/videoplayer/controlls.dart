@@ -16,8 +16,6 @@ class Controlls extends StatefulWidget {
 
 class _ControllsState extends State<Controlls> {
   bool repeatOn = false;
-  double mainIconSize = 50;
-  double iconSize = 35;
   double speed = 1.0;
 
   play() {
@@ -71,52 +69,71 @@ class _ControllsState extends State<Controlls> {
   @override
   Widget build(BuildContext context) {
 
+    ownIconButton({icon, function, double size = 60}){
+      return Container(
+        margin: EdgeInsets.all(15),
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(width: 2)
+        ),
+        child: IconButton(
+          onPressed: function,
+          iconSize: size >= 80 ? 40 : 35,
+          icon: icon,
+        ),
+      );
+    }
+
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            IconButton(
-                icon: Icon(Icons.replay_10),
-                iconSize: mainIconSize,
-                onPressed: () => rewind()),
-            IconButton(
-              onPressed: () async{
-                if(widget.videoPlayer.value.isPlaying){
-                  widget.videoPlayer.pause();
-                  await FlutterBackground.disableBackgroundExecution();
-                }else {
-                  widget.videoPlayer.play();
-                  await FlutterBackground.enableBackgroundExecution();
-                }
-
-                setState(() {});
-              },
-              iconSize: mainIconSize,
-              icon: Icon(widget.videoPlayer.value.isPlaying
-                  ? Icons.pause
-                  : Icons.play_arrow),
+            ownIconButton(
+              icon: Icon(Icons.replay_10),
+              function: () => rewind(),
             ),
-            IconButton(
-              iconSize: mainIconSize,
+            ownIconButton(
+                icon: Icon(widget.videoPlayer.value.isPlaying
+                    ? Icons.pause
+                    : Icons.play_arrow),
+                  function:  () async{
+                  if(widget.videoPlayer.value.isPlaying){
+                    widget.videoPlayer.pause();
+                    await FlutterBackground.disableBackgroundExecution();
+                  }else {
+                    widget.videoPlayer.play();
+                    await FlutterBackground.enableBackgroundExecution();
+                  }
+
+                  setState(() {});
+                },
+                size: 80
+            ),
+            ownIconButton(
               icon: Icon(Icons.forward_10),
-              onPressed: () => forward(),
+              function: () => forward(),
             ),
-
           ],
         ),
-        Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-          IconButton(
-            iconSize: iconSize,
+        SizedBox(height: 25,),
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          ownIconButton(
             icon: repeatOn ? Icon(Icons.repeat_on_outlined) : Icon(Icons.repeat),
-            onPressed: () => repeat(!repeatOn),
+            function: () => repeat(!repeatOn)
           ),
           InkWell(
             onTap: () => changeSpeed(),
             child: Container(
-              width: iconSize,
-              height: iconSize,
-              decoration: BoxDecoration(border: Border.all(width: 2)),
+              width: 60,
+              height: 60,
+              margin: EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(width: 2)
+              ),
               child: Center(
                   child: Text(
                     speed.toString() + "x",
@@ -124,22 +141,22 @@ class _ControllsState extends State<Controlls> {
                   )),
             ),
           ),
-          IconButton(
-            iconSize: mainIconSize - 10,
+          ownIconButton(
             icon: Icon(Icons.fullscreen),
-            onPressed: (){
+            function: (){
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => VideoFullScreen(videoPlayer: widget.videoPlayer)),
               );
-            },
+            }
           ),
-          IconButton(
-            iconSize: iconSize,
+
+          ownIconButton(
             icon: Icon(Icons.picture_in_picture),
-            onPressed: () => SimplePip().enterPipMode(),
+            function: () => SimplePip().enterPipMode()
           ),
-        ],)
+        ],),
+        SizedBox(height: 15)
       ],
     );
   }

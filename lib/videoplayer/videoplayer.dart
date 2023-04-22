@@ -7,9 +7,9 @@ import 'controlls.dart';
 
 class OwnVideoPlayer extends StatefulWidget {
   var mediaFile;
-  var videoController;
+  VideoPlayerController videoController;
 
-  OwnVideoPlayer({Key? key, required this.mediaFile, this.videoController}) : super(key: key);
+  OwnVideoPlayer({Key? key, required this.mediaFile,required this.videoController}) : super(key: key);
 
   @override
   State<OwnVideoPlayer> createState() => _OwnVideoPlayerState();
@@ -65,36 +65,38 @@ class _OwnVideoPlayerState extends State<OwnVideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-
-    return Column(
-      children: [
-        Center(
-          child: widget.videoController.value.isInitialized
-              ? AspectRatio(
-                  aspectRatio: widget.videoController.value.aspectRatio,
-                  child: VideoPlayer(widget.videoController),
-                )
-              : Container(),
-        ),
-        Container(
-          margin: EdgeInsets.all(10),
-          child: ProgressBar(
-            progress: videoProgress,
-            buffered: videoBuffered,
-            total: videoLength,
-            onSeek: (duration) {
-              widget.videoController.seekTo(duration);
-            },
+    return Expanded(
+      child: Column(
+        children: [
+          Center(
+            child: widget.videoController.value.isInitialized
+                ? AspectRatio(
+                    aspectRatio: widget.videoController.value.aspectRatio,
+                    child: VideoPlayer(widget.videoController),
+                  )
+                : Container(),
           ),
-        ),
-        Container(
-          margin: EdgeInsets.all(10),
-          child: Controlls(
-            videoPlayer: widget.videoController,
-            videoFile: widget.mediaFile,
+          Container(
+            margin: EdgeInsets.all(10),
+            child: ProgressBar(
+              progress: videoProgress,
+              buffered: videoBuffered,
+              total: videoLength,
+              onSeek: (duration) {
+                widget.videoController.seekTo(duration);
+              },
+            ),
           ),
-        ),
-      ],
+          Expanded(child: SizedBox.shrink()),
+          Container(
+            margin: EdgeInsets.all(10),
+            child: Controlls(
+              videoPlayer: widget.videoController,
+              videoFile: widget.mediaFile,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
