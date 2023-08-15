@@ -50,10 +50,14 @@ class _FolderPageState extends State<FolderPage> {
     for(var path in searchPaths){
       try{
         var files = Directory(path).listSync(recursive: true);
+        print(files);
 
         for(var file in files){
+          print(file.path);
           if(file.path.endsWith('.mp3') || file.path.endsWith('.mp4')) allFiles.add(file);
         }
+
+
       }catch(_){}
 
     }
