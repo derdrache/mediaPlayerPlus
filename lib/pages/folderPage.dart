@@ -118,6 +118,49 @@ class _FolderPageState extends State<FolderPage> {
 
     }
 
+    deleteWindow(videoTitle, video, status, videoData, downloadUrl){
+      return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('delete Video'),
+            content: const Text(
+              'Are you sure you want to delete the video?',
+            ),
+            actions: <Widget>[
+              TextButton(
+                style: TextButton.styleFrom(
+                  textStyle: Theme.of(context).textTheme.labelLarge,
+                ),
+                child: const Text('Chancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                style: TextButton.styleFrom(
+                  textStyle: Theme.of(context).textTheme.labelLarge,
+                ),
+                child: const Text('Delete'),
+                onPressed: () async {
+                  if(status != "done" && status.isNotEmpty){
+                    ALDownloader.cancel(downloadUrl);
+                    FlutterLocalNotificationsPlugin().cancel(videoData["id"]);
+                  }
+
+                  await Permission.storage.request();
+                  video.deleteSync();
+                  mediaBox.delete(videoTitle);
+
+                  setState(() {});
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     createVideoDisplay(video){
       String videoTitle = video.path.split("/").last.replaceAll(".mp4", "");
       Map videoData = mediaBox.get(videoTitle) ?? {};
@@ -170,18 +213,7 @@ class _FolderPageState extends State<FolderPage> {
               ),
               const SizedBox(width: 10),
               IconButton(
-                  onPressed: () async {
-                    if(status != "done" && status.isNotEmpty){
-                      ALDownloader.cancel(downloadUrl);
-                      FlutterLocalNotificationsPlugin().cancel(videoData["id"]);
-                    }
-
-                    await Permission.storage.request();
-                    video.deleteSync();
-                    mediaBox.delete(videoTitle);
-
-                    setState(() {});
-                  },
+                  onPressed: () => deleteWindow(videoTitle, video, status, videoData, downloadUrl),
                   color: Colors.red,
                   iconSize: 30,
                   icon: status == "done" || videoData["typ"] == "ownMedia" || videoData.isEmpty

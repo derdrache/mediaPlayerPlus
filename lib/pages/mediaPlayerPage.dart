@@ -78,6 +78,38 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
   @override
   Widget build(BuildContext context) {
 
+    deleteWindow(videoTitle){
+      return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('delete Video'),
+            content: const Text(
+              'Are you sure you want to delete the video?',
+            ),
+            actions: <Widget>[
+              TextButton(
+                style: TextButton.styleFrom(
+                  textStyle: Theme.of(context).textTheme.labelLarge,
+                ),
+                child: const Text('Chancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                style: TextButton.styleFrom(
+                  textStyle: Theme.of(context).textTheme.labelLarge,
+                ),
+                child: const Text('Delete'),
+                onPressed: () => deleteFile(videoTitle),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     videoInfoContainer(){
       String videoTitle = widget.videoFile.path.split("/").last.replaceAll(".mp4", "");
       writeLocalDB(videoTitle);
@@ -105,7 +137,7 @@ class _MediaPlayerPageState extends State<MediaPlayerPage> {
                       )),
                       const SizedBox(width: 10),
                       IconButton(
-                          onPressed: () => deleteFile(videoTitle),
+                          onPressed: () => deleteWindow(videoTitle),
                           color: Colors.red,
                           iconSize: 30,
                           icon: const Icon(Icons.delete)
